@@ -1,11 +1,11 @@
 {
   "id": "task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg",
-  "status": "active",
-  "stage": "implementation",
-  "phase": 0,
+  "status": "completed",
+  "stage": "release",
+  "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T22:46:07Z",
-  "updatedAt": "2026-06-20T22:52:47Z",
+  "updatedAt": "2026-06-20T22:58:07Z",
   "events": [
     {
       "base_branch": "main",
@@ -119,6 +119,297 @@
       "timed_out": false,
       "timestamp": "2026-06-20T22:52:47Z",
       "type": "agent_exited"
+    },
+    {
+      "note": "Starting Phase 1: remove --vlc from --url branch, update URL to /0, update help text, update tests",
+      "phase": 0,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:53:13Z",
+      "type": "work_resumed"
+    },
+    {
+      "description": "Starting phase 1: Fix the --url streaming path",
+      "percentage": 0,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:53:16Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running verification checks",
+      "percentage": 60,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:53:43Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running full check suite",
+      "percentage": 80,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:53:56Z",
+      "type": "progress_report"
+    },
+    {
+      "details": "39/39 passed (1 new test added: S13.test_url_flag_no_vlc). All pre-existing tests continue to pass.",
+      "failed": 0,
+      "passed": 39,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-20T22:54:00Z",
+      "type": "test_results"
+    },
+    {
+      "description": "Phase 1 implementation complete — awaiting approval",
+      "percentage": 100,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:54:05Z",
+      "type": "progress_report"
+    },
+    {
+      "artifacts_created": [
+        "dhtplay",
+        "test_dhtplay.py"
+      ],
+      "phase": 0,
+      "summary": "Removed --vlc from wt_cmd_http in the --url branch (dhtplay line 185); updated printed URL suffix from / to /0 (line 186); updated --url help text to describe HTTP-only streaming with no local player; added S13.test_url_flag_no_vlc asserting --vlc is absent from Popen args when --url is active; updated S13.test_url_flag_prints_http_url to assert /0 in the output. 39/39 tests pass.",
+      "timestamp": "2026-06-20T22:54:12Z",
+      "type": "phase_completed"
+    },
+    {
+      "change_summary": "Phase 1 complete: Fix the --url streaming path",
+      "revision": 1,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:54:19Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "items": [
+        {
+          "description": "Run `./dhtplay <infohash> --url --dry-run` (using any valid 40-hex infohash) — confirm it exits before the --url branch and prints only a magnet URI, not an HTTP URL"
+        },
+        {
+          "description": "Run `./dhtplay --help | grep -A4 '\\-\\-url'` and confirm the output contains no mention of 'VLC also opens locally'"
+        },
+        {
+          "description": "Run `grep -- '--vlc' dhtplay` and confirm only one line appears (the `wt_cmd` line), with no `--vlc` in the `wt_cmd_http` list"
+        },
+        {
+          "description": "Run `python3 test_dhtplay.py` and confirm it exits 0 with 39/39 tests passing"
+        },
+        {
+          "description": "Run `./dhtplay <infohash> --url` with a real infohash and confirm the printed URL ends with `/0` (e.g. `http://192.168.1.x:8000/0`) and that VLC does not open on the local machine"
+        }
+      ],
+      "phase": 0,
+      "phase_title": "Fix the --url streaming path",
+      "timestamp": "2026-06-20T22:54:26Z",
+      "type": "manual_tests"
+    },
+    {
+      "agent_phase": 1,
+      "phase_title": "Fix the --url streaming path",
+      "server_phase": 0,
+      "timestamp": "2026-06-20T22:54:31Z",
+      "type": "phase_drift_detected"
+    },
+    {
+      "phase": 0,
+      "phase_title": "Fix the --url streaming path",
+      "timestamp": "2026-06-20T22:54:31Z",
+      "type": "phase_awaiting_approval",
+      "worktree_head": "fd9db9947f846aa41f05c2297c04d9819375b5cc",
+      "worktree_status_digest": "ac15eab7c6c8449b5fde20254efc9dcf31d893e524a9e9d485b52f0f52c6d5fb"
+    },
+    {
+      "approved_by": "user",
+      "phase": 0,
+      "phase_title": "Fix the --url streaming path",
+      "timestamp": "2026-06-20T22:54:44Z",
+      "type": "phase_approved"
+    },
+    {
+      "checked_indices": [],
+      "phase": 0,
+      "timestamp": "2026-06-20T22:54:44Z",
+      "type": "manual_tests_checks_persisted"
+    },
+    {
+      "stage": "implementation",
+      "summary": "All phases approved — implementation ready for review.",
+      "timestamp": "2026-06-20T22:54:44Z",
+      "type": "stage_work_complete",
+      "worktree_head": "c58fa2a7b4de1925cd9f75e2f8600582db3edf14",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T22:54:45Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:54:44Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "d5ad3ded74f3dcef951d9cea80606bb8f42211c8",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "implementation",
+      "stale_worktree_head": "c58fa2a7b4de1925cd9f75e2f8600582db3edf14",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T22:54:45Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:54:45Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "implementation",
+      "timestamp": "2026-06-20T22:54:45Z",
+      "to": "review",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:54:45Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvkkwrkpae90ykea674yx86h",
+      "stage": "review",
+      "timestamp": "2026-06-20T22:54:45Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "details": "python3 test_dhtplay.py — 39/39 passed, all S01–S16 scenarios pass including new S13.test_url_flag_no_vlc",
+      "failed": 0,
+      "passed": 39,
+      "phase": 1,
+      "skipped": 0,
+      "timestamp": "2026-06-20T22:55:45Z",
+      "type": "test_results"
+    },
+    {
+      "change_summary": "APPROVE: All 6 acceptance criteria pass. The --url branch omits --vlc from the webtorrent command, the printed URL ends with /0 for direct mobile playback, the non-url default path is untouched, and the help text no longer references local VLC. 39/39 tests pass including the new no-vlc assertion.",
+      "revision": 1,
+      "stage": "review",
+      "timestamp": "2026-06-20T22:56:10Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Review verdict: APPROVE",
+      "rationale": "6/6 acceptance criteria passed, 1/1 automated checks passed (39/39 tests). Implementation is surgical and correct: --vlc removed from --url branch only, URL updated to /0, help text accurate, non-url path unchanged.",
+      "timestamp": "2026-06-20T22:56:15Z",
+      "type": "decision"
+    },
+    {
+      "stage": "review",
+      "summary": "APPROVE — all 6 ACs pass, 39/39 tests pass. Implementation is clean and correct.",
+      "timestamp": "2026-06-20T22:56:21Z",
+      "type": "stage_work_complete",
+      "worktree_head": "d5ad3ded74f3dcef951d9cea80606bb8f42211c8",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:56:26Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "actor": null,
+      "stage": "review",
+      "timestamp": "2026-06-20T22:56:26Z",
+      "type": "stage_approved"
+    },
+    {
+      "from": "review",
+      "timestamp": "2026-06-20T22:56:26Z",
+      "to": "release",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:56:27Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvkkzvdqqy6w1dserjdvhrg1",
+      "stage": "release",
+      "timestamp": "2026-06-20T22:56:27Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvkkwrkpae90ykea674yx86h",
+      "timed_out": false,
+      "timestamp": "2026-06-20T22:56:27Z",
+      "type": "agent_exited"
+    },
+    {
+      "note": "Starting release: build verified, pushing branch and recording release",
+      "phase": 1,
+      "stage": "release",
+      "timestamp": "2026-06-20T22:57:03Z",
+      "type": "work_resumed"
+    },
+    {
+      "change_summary": "Release validated — build passes, code pushed",
+      "revision": 1,
+      "stage": "release",
+      "timestamp": "2026-06-20T22:57:27Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Release complete — task done",
+      "rationale": "Production build passes, review approved on 2026-06-20, code committed (c58fa2a) and pushed to origin",
+      "timestamp": "2026-06-20T22:57:30Z",
+      "type": "decision"
+    },
+    {
+      "stage": "release",
+      "summary": "Release complete. Production build passes, review approved 2026-06-20 (6/6 ACs, 39/39 tests), code pushed to origin on feature branch. Completion mode is merge — orchestrator handles the merge to main.",
+      "timestamp": "2026-06-20T22:57:35Z",
+      "type": "stage_work_complete",
+      "worktree_head": "d5ad3ded74f3dcef951d9cea80606bb8f42211c8",
+      "worktree_status_digest": "53a0d8d0ae35b48750cab27bfcc4342542a401fcdb1d066a63bc96583683d58c"
+    },
+    {
+      "base_branch": "main",
+      "files_changed": 3,
+      "lines_added": 21,
+      "lines_removed": 4,
+      "timestamp": "2026-06-20T22:58:06Z",
+      "type": "worktree_merged"
+    },
+    {
+      "timestamp": "2026-06-20T22:58:06Z",
+      "type": "worktree_removed"
+    },
+    {
+      "branch": "feature/task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg",
+      "timestamp": "2026-06-20T22:58:07Z",
+      "type": "remote_branch_deleted"
+    },
+    {
+      "actor": null,
+      "timestamp": "2026-06-20T22:58:07Z",
+      "type": "task_completed"
     }
   ],
   "needsArchitecture": false,
@@ -136,32 +427,111 @@
     "rationale": "Bug fix correcting --url flag behavior — no UI changes (skip design), well-contained to 2 files with no new system boundaries (skip architecture). Three surgical line-level edits in dhtplay plus test updates in test_dhtplay.py."
   },
   "stageApprovals": {
+    "implementation": "2026-06-20T22:54:44Z",
+    "review": "2026-06-20T22:56:26Z",
     "scope": "2026-06-20T22:52:47Z"
   },
+  "completedAt": "2026-06-20T22:58:07Z",
+  "stageContent": {
+    "implementation": "## Phase 1: Fix the --url streaming path\n\n**Files changed:**\n- `dhtplay` — removed `--vlc` from `wt_cmd_http`; changed printed URL from `/{port}/` to `/{port}/0`; updated `--url` help text to \"start the HTTP streaming server only (no local player) and print a URL pointing directly to the first file\"\n- `test_dhtplay.py` — updated `S13.test_url_flag_prints_http_url` to assert `/0` in the printed URL; added `S13.test_url_flag_no_vlc` asserting `--vlc` is absent from Popen call args when `--url` is active\n\n**Test results:** 39/39 passed (1 new test added)\n\n**Verification:**\n- `grep -- '--vlc' dhtplay` returns only the `wt_cmd` line (non-`--url` branch) — confirmed\n- `./dhtplay --help | grep -A3 '\\-\\-url'` shows no mention of \"VLC also opens locally\" — confirmed\n",
+    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll 6 acceptance criteria pass. The --url branch omits --vlc from the webtorrent command, the printed URL ends with /0 for direct mobile playback, the non-url default path is untouched, and the help text no longer references local VLC. 39/39 tests pass including the new no-vlc assertion.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite | PASS | 39/39 passed (python3 test_dhtplay.py) |\n\n### Acceptance Criteria (6/6 passed)\n\n- [x] AC-1: Running `dhtplay <infohash> --url` calls `subprocess.Popen` with a command that does NOT contain `--vlc`; verified by inspecting `popen_mock.call_args` in S13. — PASS: dhtplay:185 — wt_cmd_http = [wt, magnet, \"-p\", str(args.port)] contains no --vlc. S13.test_url_flag_no_vlc at test_dhtplay.py:423 asserts assertNotIn(\"--vlc\", call_args) and passes.\n- [x] AC-2: The URL printed to stdout by `dhtplay <infohash> --url` ends with `/0` (e.g. `http://192.168.1.100:8000/0`); verified by updated S13 assertion. — PASS: dhtplay:186 — print(f\"▶  http://{lan_ip}:{args.port}/0\"). S13.test_url_flag_prints_http_url at test_dhtplay.py:407 asserts assertIn(\"/0\", output) and passes.\n- [x] AC-3: Running `dhtplay <infohash>` (without `--url`) still calls `subprocess.Popen` with `--vlc` in the args; verified by S11 tests remaining unchanged and passing. — PASS: dhtplay:181 — wt_cmd = [wt, magnet, \"--vlc\", \"-p\", str(args.port)]. grep '--vlc' dhtplay returns exactly this one line. S11.test_popen_called_with_magnet at test_dhtplay.py:334 asserts call_args[2] == \"--vlc\" and passes.\n- [x] AC-4: A new test assertion in S13 (or a new S17 scenario) asserts that `--vlc` is absent from the Popen call args when `--url` is active. — PASS: test_dhtplay.py:409-423 — S13.test_url_flag_no_vlc is a new test method that patches Popen, calls main with --url, then asserts assertNotIn(\"--vlc\", popen_mock.call_args[0][0]). Test passes.\n- [x] AC-5: `./dhtplay --help` output for `--url` contains no reference to VLC opening locally; verified by `./dhtplay --help | grep -A3 '\\-\\-url'`. — PASS: dhtplay:144-146 — help text reads \"start the HTTP streaming server only (no local player) and print a URL pointing directly to the first file; open it on another device via Media → Open Network Stream\". ./dhtplay --help | grep -A3 '\\-\\-url' shows no mention of \"VLC also opens locally\".\n- [x] AC-6: `python3 test_dhtplay.py` exits 0 with all tests passing. — PASS: python3 test_dhtplay.py output: Ran 39 tests in 0.055s, OK, RESULTS: 39/39 passed — ALL PASS. Exit code 0.\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Hardcode /0 as the file index path rather than parsing webtorrent stdout — simpler, sufficient for the single-file common case, and consistent with webtorrent-cli's numeric index path convention.\n\n## Required Changes\n\nNone.\n",
+    "release": "## Release Notes\n\n### What was built\n- Removed `--vlc` from the webtorrent command in the `--url` branch so that running `dhtplay <infohash> --url` no longer opens VLC on the local machine\n- Updated the printed URL suffix from `/` to `/0` so mobile VLC can open the stream directly without navigating a file listing\n- Updated the `--url` argument help text to accurately describe HTTP-only streaming with no local player\n- Added a new test (`S13.test_url_flag_no_vlc`) verifying `--vlc` is absent from Popen args when `--url` is active\n\n### Key decisions\n- Hardcode `/0` as the file index path rather than parsing webtorrent's stdout for the actual filename — simpler, sufficient for the single-file common case, and consistent with webtorrent-cli's numeric index path convention\n\n### Changes by phase\n- **Phase 1: Fix the --url streaming path** — Removed `--vlc` from `wt_cmd_http` in `dhtplay`; updated printed URL from `/{port}/` to `/{port}/0`; updated `--url` help text; added S13.test_url_flag_no_vlc; updated S13.test_url_flag_prints_http_url to assert `/0`. 39/39 tests pass.\n\n## Verification\n\n- Production build (py_compile): PASS\n- Test suite: 39/39 passed\n- `grep -- '--vlc' dhtplay` returns only the `wt_cmd` line (non-`--url` branch)\n- `./dhtplay --help | grep -A3 '\\-\\-url'` contains no reference to local VLC\n- Branch pushed to origin: `feature/task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg`\n- Commit: `c58fa2a feat(task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg): phase 1 — Fix the --url streaming path`\n"
+  },
   "stages": {
-    "architecture": {
-      "status": "skipped"
-    },
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T22:52:47Z"
-    },
-    "review": {
-      "status": "not_started"
-    },
-    "design": {
-      "status": "skipped"
+    "release": {
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-20T22:56:27Z"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-20T22:52:47Z",
       "startedAt": "2026-06-20T22:47:55Z"
     },
-    "release": {
-      "status": "not_started"
+    "architecture": {
+      "status": "skipped"
+    },
+    "implementation": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:54:44Z",
+      "startedAt": "2026-06-20T22:52:47Z"
+    },
+    "review": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:56:26Z",
+      "startedAt": "2026-06-20T22:54:45Z"
+    },
+    "design": {
+      "status": "skipped"
     }
   },
-  "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg",
-  "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-20T22:52:47Z"
+  "worktreeLastSyncedAt": "2026-06-20T22:56:27Z",
+  "reviewPayload": {
+    "verdict": "approve",
+    "summary": "All 6 acceptance criteria pass. The --url branch omits --vlc from the webtorrent command, the printed URL ends with /0 for direct mobile playback, the non-url default path is untouched, and the help text no longer references local VLC. 39/39 tests pass including the new no-vlc assertion.",
+    "filesReviewedCount": 2,
+    "phasesReviewedCount": 1,
+    "automatedChecks": [
+      {
+        "name": "Test suite",
+        "result": "pass",
+        "detail": "39/39 passed (python3 test_dhtplay.py)"
+      }
+    ],
+    "acceptanceCriteria": [
+      {
+        "acId": "AC-1",
+        "text": "Running `dhtplay <infohash> --url` calls `subprocess.Popen` with a command that does NOT contain `--vlc`; verified by inspecting `popen_mock.call_args` in S13.",
+        "status": "pass",
+        "evidence": "dhtplay:185 — wt_cmd_http = [wt, magnet, \"-p\", str(args.port)] contains no --vlc. S13.test_url_flag_no_vlc at test_dhtplay.py:423 asserts assertNotIn(\"--vlc\", call_args) and passes."
+      },
+      {
+        "acId": "AC-2",
+        "text": "The URL printed to stdout by `dhtplay <infohash> --url` ends with `/0` (e.g. `http://192.168.1.100:8000/0`); verified by updated S13 assertion.",
+        "status": "pass",
+        "evidence": "dhtplay:186 — print(f\"▶  http://{lan_ip}:{args.port}/0\"). S13.test_url_flag_prints_http_url at test_dhtplay.py:407 asserts assertIn(\"/0\", output) and passes."
+      },
+      {
+        "acId": "AC-3",
+        "text": "Running `dhtplay <infohash>` (without `--url`) still calls `subprocess.Popen` with `--vlc` in the args; verified by S11 tests remaining unchanged and passing.",
+        "status": "pass",
+        "evidence": "dhtplay:181 — wt_cmd = [wt, magnet, \"--vlc\", \"-p\", str(args.port)]. grep '--vlc' dhtplay returns exactly this one line. S11.test_popen_called_with_magnet at test_dhtplay.py:334 asserts call_args[2] == \"--vlc\" and passes."
+      },
+      {
+        "acId": "AC-4",
+        "text": "A new test assertion in S13 (or a new S17 scenario) asserts that `--vlc` is absent from the Popen call args when `--url` is active.",
+        "status": "pass",
+        "evidence": "test_dhtplay.py:409-423 — S13.test_url_flag_no_vlc is a new test method that patches Popen, calls main with --url, then asserts assertNotIn(\"--vlc\", popen_mock.call_args[0][0]). Test passes."
+      },
+      {
+        "acId": "AC-5",
+        "text": "`./dhtplay --help` output for `--url` contains no reference to VLC opening locally; verified by `./dhtplay --help | grep -A3 '\\-\\-url'`.",
+        "status": "pass",
+        "evidence": "dhtplay:144-146 — help text reads \"start the HTTP streaming server only (no local player) and print a URL pointing directly to the first file; open it on another device via Media → Open Network Stream\". ./dhtplay --help | grep -A3 '\\-\\-url' shows no mention of \"VLC also opens locally\"."
+      },
+      {
+        "acId": "AC-6",
+        "text": "`python3 test_dhtplay.py` exits 0 with all tests passing.",
+        "status": "pass",
+        "evidence": "python3 test_dhtplay.py output: Ran 39 tests in 0.055s, OK, RESULTS: 39/39 passed — ALL PASS. Exit code 0."
+      }
+    ],
+    "headlineFindings": [],
+    "requiredChanges": [],
+    "codeQualityFindings": [],
+    "securityFindings": [],
+    "decisions": [
+      "Hardcode /0 as the file index path rather than parsing webtorrent stdout — simpler, sufficient for the single-file common case, and consistent with webtorrent-cli's numeric index path convention."
+    ],
+    "revision": 1,
+    "changeAnnotations": [
+      {
+        "file": "dhtplay",
+        "note": "Removes --vlc from the --url branch command list, appends /0 to the printed URL, and updates the --url help text to describe HTTP-only streaming with no local player."
+      },
+      {
+        "file": "test_dhtplay.py",
+        "note": "Updates S13.test_url_flag_prints_http_url to assert /0 in output; adds S13.test_url_flag_no_vlc asserting --vlc is absent from Popen call args when --url is active."
+      }
+    ]
+  }
 }

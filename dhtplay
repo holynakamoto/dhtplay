@@ -142,7 +142,7 @@ def main(argv=None):
     ap.add_argument(
         "--url", "-u",
         action="store_true",
-        help="print a remote-accessible stream URL and start the HTTP server (VLC also opens locally; open the printed URL on another machine via Media → Open Network Stream)",
+        help="start the HTTP streaming server only (no local player) and print a URL pointing directly to the first file; open it on another device via Media → Open Network Stream",
     )
     ap.add_argument(
         "--port", "-p",
@@ -182,8 +182,8 @@ def main(argv=None):
 
     if args.url:
         lan_ip = get_lan_ip()
-        wt_cmd_http = [wt, magnet, "--vlc", "-p", str(args.port)]
-        print(f"▶  http://{lan_ip}:{args.port}/")
+        wt_cmd_http = [wt, magnet, "-p", str(args.port)]
+        print(f"▶  http://{lan_ip}:{args.port}/0")
         try:
             proc = subprocess.Popen(wt_cmd_http)
         except OSError as exc:

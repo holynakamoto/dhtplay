@@ -3,7 +3,7 @@ defract:
   id: task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg
   type: bug
   status: active
-  stage: implementation
+  stage: release
   phase: 0
   total_phases: 1
   priority: normal
@@ -13,7 +13,6 @@ defract:
   created_by: holynakamoto
   assignee: holynakamoto
 ---
-
 
 ## Story Brief
 
@@ -103,3 +102,83 @@ The `--url` branch in `main()` (lines 183–197 of `dhtplay`) currently builds `
 The project profile notes a `_find_stream_url` function that was intended to parse webtorrent's stdout for the actual filename URL — this function does not appear in the current file. Appending `/0` to the root URL is the correct approach per the approved intent check and avoids stdout capture complexity.
 
 The current `--url` help string (lines 143–145) reads: "print a remote-accessible stream URL and start the HTTP server (VLC also opens locally; open the printed URL on another machine via Media → Open Network Stream)". The replacement should convey that only the HTTP server starts and the URL points directly to the first stream file.
+
+## Implementation Notes
+
+## Phase 1: Fix the --url streaming path
+
+**Files changed:**
+- `dhtplay` — removed `--vlc` from `wt_cmd_http`; changed printed URL from `/{port}/` to `/{port}/0`; updated `--url` help text to "start the HTTP streaming server only (no local player) and print a URL pointing directly to the first file"
+- `test_dhtplay.py` — updated `S13.test_url_flag_prints_http_url` to assert `/0` in the printed URL; added `S13.test_url_flag_no_vlc` asserting `--vlc` is absent from Popen call args when `--url` is active
+
+**Test results:** 39/39 passed (1 new test added)
+
+**Verification:**
+- `grep -- '--vlc' dhtplay` returns only the `wt_cmd` line (non-`--url` branch) — confirmed
+- `./dhtplay --help | grep -A3 '\-\-url'` shows no mention of "VLC also opens locally" — confirmed
+
+## Review
+
+## Verdict
+
+**Verdict:** APPROVE
+**Files reviewed:** 2 files changed across 1 phases
+
+All 6 acceptance criteria pass. The --url branch omits --vlc from the webtorrent command, the printed URL ends with /0 for direct mobile playback, the non-url default path is untouched, and the help text no longer references local VLC. 39/39 tests pass including the new no-vlc assertion.
+
+### Automated Checks
+
+| Check | Result | Details |
+|-------|--------|---------|
+| Test suite | PASS | 39/39 passed (python3 test_dhtplay.py) |
+
+### Acceptance Criteria (6/6 passed)
+
+- [x] AC-1: Running `dhtplay <infohash> --url` calls `subprocess.Popen` with a command that does NOT contain `--vlc`; verified by inspecting `popen_mock.call_args` in S13. — PASS: dhtplay:185 — wt_cmd_http = [wt, magnet, "-p", str(args.port)] contains no --vlc. S13.test_url_flag_no_vlc at test_dhtplay.py:423 asserts assertNotIn("--vlc", call_args) and passes.
+- [x] AC-2: The URL printed to stdout by `dhtplay <infohash> --url` ends with `/0` (e.g. `http://192.168.1.100:8000/0`); verified by updated S13 assertion. — PASS: dhtplay:186 — print(f"▶  http://{lan_ip}:{args.port}/0"). S13.test_url_flag_prints_http_url at test_dhtplay.py:407 asserts assertIn("/0", output) and passes.
+- [x] AC-3: Running `dhtplay <infohash>` (without `--url`) still calls `subprocess.Popen` with `--vlc` in the args; verified by S11 tests remaining unchanged and passing. — PASS: dhtplay:181 — wt_cmd = [wt, magnet, "--vlc", "-p", str(args.port)]. grep '--vlc' dhtplay returns exactly this one line. S11.test_popen_called_with_magnet at test_dhtplay.py:334 asserts call_args[2] == "--vlc" and passes.
+- [x] AC-4: A new test assertion in S13 (or a new S17 scenario) asserts that `--vlc` is absent from the Popen call args when `--url` is active. — PASS: test_dhtplay.py:409-423 — S13.test_url_flag_no_vlc is a new test method that patches Popen, calls main with --url, then asserts assertNotIn("--vlc", popen_mock.call_args[0][0]). Test passes.
+- [x] AC-5: `./dhtplay --help` output for `--url` contains no reference to VLC opening locally; verified by `./dhtplay --help | grep -A3 '\-\-url'`. — PASS: dhtplay:144-146 — help text reads "start the HTTP streaming server only (no local player) and print a URL pointing directly to the first file; open it on another device via Media → Open Network Stream". ./dhtplay --help | grep -A3 '\-\-url' shows no mention of "VLC also opens locally".
+- [x] AC-6: `python3 test_dhtplay.py` exits 0 with all tests passing. — PASS: python3 test_dhtplay.py output: Ran 39 tests in 0.055s, OK, RESULTS: 39/39 passed — ALL PASS. Exit code 0.
+
+### Code Quality (Refactor Review)
+
+No code quality issues found in changed files.
+
+### Security Assessment (Security Review)
+
+No security issues found in changed files.
+
+### Decisions Made During Implementation
+
+- Hardcode /0 as the file index path rather than parsing webtorrent stdout — simpler, sufficient for the single-file common case, and consistent with webtorrent-cli's numeric index path convention.
+
+## Required Changes
+
+None.
+
+## Release
+
+## Release Notes
+
+### What was built
+- Removed `--vlc` from the webtorrent command in the `--url` branch so that running `dhtplay <infohash> --url` no longer opens VLC on the local machine
+- Updated the printed URL suffix from `/` to `/0` so mobile VLC can open the stream directly without navigating a file listing
+- Updated the `--url` argument help text to accurately describe HTTP-only streaming with no local player
+- Added a new test (`S13.test_url_flag_no_vlc`) verifying `--vlc` is absent from Popen args when `--url` is active
+
+### Key decisions
+- Hardcode `/0` as the file index path rather than parsing webtorrent's stdout for the actual filename — simpler, sufficient for the single-file common case, and consistent with webtorrent-cli's numeric index path convention
+
+### Changes by phase
+- **Phase 1: Fix the --url streaming path** — Removed `--vlc` from `wt_cmd_http` in `dhtplay`; updated printed URL from `/{port}/` to `/{port}/0`; updated `--url` help text; added S13.test_url_flag_no_vlc; updated S13.test_url_flag_prints_http_url to assert `/0`. 39/39 tests pass.
+
+## Verification
+
+- Production build (py_compile): PASS
+- Test suite: 39/39 passed
+- `grep -- '--vlc' dhtplay` returns only the `wt_cmd` line (non-`--url` branch)
+- `./dhtplay --help | grep -A3 '\-\-url'` contains no reference to local VLC
+- Branch pushed to origin: `feature/task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg`
+- Commit: `c58fa2a feat(task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg): phase 1 — Fix the --url streaming path`
+

@@ -383,7 +383,7 @@ class S12_CLIEndToEnd(unittest.TestCase):
 # S13 — --url flag prints a http:// URL containing the port number
 # ===========================================================================
 class S13_UrlFlag(unittest.TestCase):
-    """CRITERIA: --url prints http://<ip>:<port>/ to stdout and returns exit code 0."""
+    """CRITERIA: --url prints http://<ip>:<port>/0 to stdout, no --vlc in Popen args, exit code 0."""
 
     IH = "aabbccddee" * 4
     WT = "/opt/homebrew/bin/webtorrent"
@@ -404,6 +404,23 @@ class S13_UrlFlag(unittest.TestCase):
         output = out.getvalue()
         self.assertIn("http://", output)
         self.assertIn("8000", output)
+        self.assertIn("/0", output)
+
+    def test_url_flag_no_vlc(self):
+        import io
+        from contextlib import redirect_stdout
+        proc_mock = MagicMock()
+        proc_mock.wait.return_value = None
+        popen_mock = MagicMock(return_value=proc_mock)
+        out = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", popen_mock), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             redirect_stdout(out):
+            rc = main([self.IH, "--url"])
+        self.assertEqual(rc, 0)
+        call_args = popen_mock.call_args[0][0]
+        self.assertNotIn("--vlc", call_args)
 
 
 # ===========================================================================

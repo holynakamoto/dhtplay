@@ -7,7 +7,6 @@ import re
 import socket
 import subprocess
 import sys
-import threading
 from urllib.parse import quote
 
 TRACKERS = [
@@ -98,6 +97,7 @@ def get_lan_ip():
                 return ip
         except (OSError, subprocess.TimeoutExpired):
             continue
+    s = None
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
@@ -105,36 +105,8 @@ def get_lan_ip():
     except OSError:
         return "127.0.0.1"
     finally:
-        s.close()
-
-
-def _find_stream_url(proc, port, timeout=30):
-    """
-    Read proc.stdout looking for the URL webtorrent passes to VLC.
-    Returns the full path (e.g. '/Movie.mkv') or None if not found within timeout.
-    webtorrent prints a line like:
-      Opening ... http://localhost:PORT/filename  (or similar)
-    """
-    url_re = re.compile(r'http://localhost:' + str(port) + r'(/\S*)')
-    result = [None]
-    done = threading.Event()
-
-    def _scan():
-        for line in proc.stdout:
-            m = url_re.search(line)
-            if m:
-                result[0] = m.group(1)
-                done.set()
-                # drain the rest so the process doesn't block on a full pipe
-                for _ in proc.stdout:
-                    pass
-                return
-        done.set()
-
-    t = threading.Thread(target=_scan, daemon=True)
-    t.start()
-    done.wait(timeout=timeout)
-    return result[0]
+        if s is not None:
+            s.close()
 
 
 def main(argv=None):

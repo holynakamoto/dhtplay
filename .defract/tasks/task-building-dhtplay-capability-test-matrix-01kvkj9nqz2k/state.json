@@ -1,11 +1,11 @@
 {
   "id": "task-building-dhtplay-capability-test-matrix-01kvkj9nqz2k",
-  "status": "active",
+  "status": "completed",
   "stage": "release",
   "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T22:26:51Z",
-  "updatedAt": "2026-06-20T22:40:38Z",
+  "updatedAt": "2026-06-20T22:42:10Z",
   "events": [
     {
       "base_branch": "main",
@@ -400,6 +400,57 @@
       "timed_out": false,
       "timestamp": "2026-06-20T22:40:38Z",
       "type": "agent_exited"
+    },
+    {
+      "note": "Starting release: run build check, push branch, update stage content, log completion",
+      "phase": 1,
+      "stage": "release",
+      "timestamp": "2026-06-20T22:41:15Z",
+      "type": "work_resumed"
+    },
+    {
+      "change_summary": "Release validated — build passes, code pushed",
+      "revision": 1,
+      "stage": "release",
+      "timestamp": "2026-06-20T22:41:49Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Release complete — task done",
+      "rationale": "Production build passes (python3 -m py_compile dhtplay), review approved on 2026-06-20, code committed and pushed to origin/feature/task-building-dhtplay-capability-test-matrix-01kvkj9nqz2k",
+      "timestamp": "2026-06-20T22:41:50Z",
+      "type": "decision"
+    },
+    {
+      "stage": "release",
+      "summary": "Release complete. Production build passes, review approved 2026-06-20 (9/9 ACs), code pushed to remote. Three defects fixed and four new scenario classes (S13–S16) ship on this branch — 38/38 tests pass on any machine.",
+      "timestamp": "2026-06-20T22:41:55Z",
+      "type": "stage_work_complete",
+      "worktree_head": "41577cee20aea3e269de0c0dabcc920c20c8e4e4",
+      "worktree_status_digest": "53a0d8d0ae35b48750cab27bfcc4342542a401fcdb1d066a63bc96583683d58c"
+    },
+    {
+      "base_branch": "main",
+      "files_changed": 3,
+      "lines_added": 134,
+      "lines_removed": 42,
+      "timestamp": "2026-06-20T22:42:09Z",
+      "type": "worktree_merged"
+    },
+    {
+      "timestamp": "2026-06-20T22:42:09Z",
+      "type": "worktree_removed"
+    },
+    {
+      "branch": "feature/task-building-dhtplay-capability-test-matrix-01kvkj9nqz2k",
+      "timestamp": "2026-06-20T22:42:10Z",
+      "type": "remote_branch_deleted"
+    },
+    {
+      "actor": null,
+      "timestamp": "2026-06-20T22:42:10Z",
+      "type": "task_completed"
     }
   ],
   "needsArchitecture": false,
@@ -417,21 +468,22 @@
     "rationale": "Bug fixes + test expansion touching only 2 files (dhtplay and test_dhtplay.py), no UI changes (skip design), well-contained to a single subsystem (skip architecture)"
   },
   "stageApprovals": {
+    "scope": "2026-06-20T22:31:29Z",
     "implementation": "2026-06-20T22:37:32Z",
-    "review": "2026-06-20T22:40:37Z",
-    "scope": "2026-06-20T22:31:29Z"
+    "review": "2026-06-20T22:40:37Z"
   },
+  "completedAt": "2026-06-20T22:42:10Z",
   "stageContent": {
-    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll 9 acceptance criteria pass. The three defects are fixed (NameError guard in get_lan_ip(), S10 environment coupling, dead _find_stream_url), and the four new scenario classes (S13–S16) are correctly implemented with full mock coverage. 38/38 tests pass on any machine regardless of webtorrent or VLC installation.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite | PASS | 38/38 tests pass across 16 scenario classes |\n| Test suite (no webtorrent in PATH) | PASS | 38/38 pass with webtorrent stripped from PATH |\n| grep _find_stream_url dhtplay | PASS | Exit code 1 — no matches found |\n\n### Acceptance Criteria (9/9 passed)\n\n- [x] AC-1: python3 test_dhtplay.py reports 16 scenarios all PASS on a machine without webtorrent-cli or VLC installed — PASS: 38/38 passed — ALL PASS printed across 16 scenario classes; confirmed with webtorrent stripped from PATH\n- [x] AC-2: S13 asserts stdout contains http:// and the configured port number; no real network calls are made — PASS: test_dhtplay.py:405-406 — assertIn('http://', output) and assertIn('8000', output); get_lan_ip patched at line 400\n- [x] AC-3: S14 asserts proc.terminate() is called exactly once after a KeyboardInterrupt from proc.wait() — PASS: test_dhtplay.py:422 — proc_mock.wait.side_effect = KeyboardInterrupt; line 431 — proc_mock.terminate.assert_called_once()\n- [x] AC-4: S15 asserts the string form of the port value and the -p flag both appear in the Popen call args list — PASS: test_dhtplay.py:454-455 — assertIn('-p', call_args) and assertIn('9999', call_args)\n- [x] AC-5: S16(c) asserts get_lan_ip() returns '127.0.0.1' (not raises NameError) when socket.socket() raises OSError — PASS: test_dhtplay.py:487-490 — patches socket.socket with OSError side_effect; asserts ip == '127.0.0.1'. dhtplay:100 initializes s=None; dhtplay:107-108 guards finally with if s is not None\n- [x] AC-6: S10 passes without webtorrent-cli installed (behavior-under-test is the resolution logic, not system state) — PASS: test_dhtplay.py:293-309 — both S10 tests patch dhtplay._executable and dhtplay.subprocess.run; test passes with webtorrent stripped from PATH\n- [x] AC-7: grep _find_stream_url dhtplay returns no matches after the change — PASS: grep _find_stream_url dhtplay exits with code 1 — no matches\n- [x] AC-8: get_lan_ip() still returns the correct IP on the happy path (ipconfig succeeds for en0) — PASS: test_dhtplay.py:464-470 — S16.test_ipconfig_success patches subprocess.run returning stdout='192.168.1.42\\n'; asserts ip == '192.168.1.42'. dhtplay:85-99 happy path unchanged\n- [x] AC-9: No test makes a real subprocess, network, or filesystem call; all external I/O is mocked — PASS: S13–S16 and refactored S10 are fully mocked. Pre-existing S12 calls subprocess.run([sys.executable, _SCRIPT, ...]) for CLI smoke tests, but S12 was outside this task's changed set and requires only the Python interpreter, not webtorrent or VLC\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- S10 refactored to mock dhtplay._executable and dhtplay.subprocess.run, preserving coverage of hardcoded-candidate-preferred-over-which logic without requiring webtorrent installed\n- _find_stream_url deleted entirely rather than deprecated — unreachable code with no callers and import threading removed with it\n- get_lan_ip() NameError fix: s = None initialized before try block; finally block guards with if s is not None: s.close()\n\n## Required Changes\n\nNone.\n",
-    "implementation": "## Phase 1: Fix defects and add missing test coverage\n\n### Files changed\n\n**`dhtplay`**\n- Fixed `get_lan_ip()` NameError: initialized `s = None` before the try block; guarded `finally` with `if s is not None: s.close()`. The happy path (ipconfig or socket succeeds) is unchanged.\n- Removed `_find_stream_url` (was lines 111–137) entirely — no callers existed.\n- Removed `import threading` (was only used by `_find_stream_url`).\n\n**`test_dhtplay.py`**\n- Refactored S10: replaced environment-coupled live `find_webtorrent()` calls with two mock-based tests verifying the resolution logic (hardcoded candidates preferred over `which` fallback).\n- Added S13 (`--url` flag): asserts stdout contains `http://` and `8000` (default port), exit code 0. Mocks Popen, find_webtorrent, get_lan_ip.\n- Added S14 (`--url` keyboard interrupt): asserts `proc.terminate()` called exactly once after `KeyboardInterrupt` from `proc.wait()`, exit code 0.\n- Added S15 (`--port` flag): asserts both `-p` and `\"9999\"` appear in the Popen call args list.\n- Added S16 (`get_lan_ip()` unit tests): three sub-tests covering ipconfig success, socket fallback, and OSError fallback to `\"127.0.0.1\"` — the last specifically exercises the formerly-buggy code path.\n\n### Test results\n38/38 tests pass across 16 scenario classes (S01–S16). No real subprocess, network, or filesystem calls are made by any test."
+    "release": "## Release Notes\n\n### What was built\n- Fixed `get_lan_ip()` NameError: initialized `s = None` before the try block and guarded `finally` with `if s is not None: s.close()`, so `socket.socket()` raising `OSError` now returns `\"127.0.0.1\"` cleanly\n- Removed dead `_find_stream_url` function and its `import threading` — no callers existed anywhere in the codebase\n- Refactored S10 to replace environment-coupled live `find_webtorrent()` calls with mock-based tests, preserving coverage of the hardcoded-candidate-preferred-over-`which` resolution logic without requiring webtorrent-cli to be installed\n- Added S13 (`--url` flag): asserts stdout contains `http://` and default port `8000`, exit code 0, all I/O mocked\n- Added S14 (`--url` keyboard interrupt): asserts `proc.terminate()` called exactly once after `KeyboardInterrupt` from `proc.wait()`, exit code 0\n- Added S15 (`--port` flag): asserts both `-p` and the port string appear in the `Popen` call args list\n- Added S16 (`get_lan_ip()` unit tests): three sub-tests covering ipconfig success path, socket fallback, and `OSError` fallback to `\"127.0.0.1\"`\n\n### Key decisions\n- S10 refactored to mock `dhtplay._executable` and `dhtplay.subprocess.run`, preserving coverage of hardcoded-candidate-preferred-over-which logic without requiring webtorrent installed\n- `_find_stream_url` deleted entirely rather than deprecated — unreachable code with no callers; `import threading` removed with it\n- `get_lan_ip()` NameError fix: `s = None` initialized before try block; `finally` block guards with `if s is not None: s.close()`\n\n### Changes by phase\n- **Phase 1: Fix defects and add missing test coverage** — Fixed `get_lan_ip()` NameError, removed dead `_find_stream_url`, refactored S10 to use mocks, added S13/S14/S15/S16. All 38 tests pass across 16 scenario classes on any machine regardless of webtorrent or VLC installation.\n\n## Verification\n\n### Production Build\n- `python3 -m py_compile dhtplay` — PASS\n\n### Review Reference\n- Approved by reviewer on 2026-06-20 — 9/9 acceptance criteria passed, all automated checks passed\n- Test suite: 38/38 tests pass across 16 scenario classes\n- Test suite (no webtorrent in PATH): 38/38 pass with webtorrent stripped from PATH\n- `grep _find_stream_url dhtplay`: exit code 1 — no matches\n\n### Release Checklist\n- [x] Approved review exists\n- [x] Production build passes\n- [x] Code committed and pushed\n- [x] Release notes prepared\n- [x] Stage content updated\n- [x] Completion event logged\n",
+    "implementation": "## Phase 1: Fix defects and add missing test coverage\n\n### Files changed\n\n**`dhtplay`**\n- Fixed `get_lan_ip()` NameError: initialized `s = None` before the try block; guarded `finally` with `if s is not None: s.close()`. The happy path (ipconfig or socket succeeds) is unchanged.\n- Removed `_find_stream_url` (was lines 111–137) entirely — no callers existed.\n- Removed `import threading` (was only used by `_find_stream_url`).\n\n**`test_dhtplay.py`**\n- Refactored S10: replaced environment-coupled live `find_webtorrent()` calls with two mock-based tests verifying the resolution logic (hardcoded candidates preferred over `which` fallback).\n- Added S13 (`--url` flag): asserts stdout contains `http://` and `8000` (default port), exit code 0. Mocks Popen, find_webtorrent, get_lan_ip.\n- Added S14 (`--url` keyboard interrupt): asserts `proc.terminate()` called exactly once after `KeyboardInterrupt` from `proc.wait()`, exit code 0.\n- Added S15 (`--port` flag): asserts both `-p` and `\"9999\"` appear in the Popen call args list.\n- Added S16 (`get_lan_ip()` unit tests): three sub-tests covering ipconfig success, socket fallback, and OSError fallback to `\"127.0.0.1\"` — the last specifically exercises the formerly-buggy code path.\n\n### Test results\n38/38 tests pass across 16 scenario classes (S01–S16). No real subprocess, network, or filesystem calls are made by any test.",
+    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll 9 acceptance criteria pass. The three defects are fixed (NameError guard in get_lan_ip(), S10 environment coupling, dead _find_stream_url), and the four new scenario classes (S13–S16) are correctly implemented with full mock coverage. 38/38 tests pass on any machine regardless of webtorrent or VLC installation.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite | PASS | 38/38 tests pass across 16 scenario classes |\n| Test suite (no webtorrent in PATH) | PASS | 38/38 pass with webtorrent stripped from PATH |\n| grep _find_stream_url dhtplay | PASS | Exit code 1 — no matches found |\n\n### Acceptance Criteria (9/9 passed)\n\n- [x] AC-1: python3 test_dhtplay.py reports 16 scenarios all PASS on a machine without webtorrent-cli or VLC installed — PASS: 38/38 passed — ALL PASS printed across 16 scenario classes; confirmed with webtorrent stripped from PATH\n- [x] AC-2: S13 asserts stdout contains http:// and the configured port number; no real network calls are made — PASS: test_dhtplay.py:405-406 — assertIn('http://', output) and assertIn('8000', output); get_lan_ip patched at line 400\n- [x] AC-3: S14 asserts proc.terminate() is called exactly once after a KeyboardInterrupt from proc.wait() — PASS: test_dhtplay.py:422 — proc_mock.wait.side_effect = KeyboardInterrupt; line 431 — proc_mock.terminate.assert_called_once()\n- [x] AC-4: S15 asserts the string form of the port value and the -p flag both appear in the Popen call args list — PASS: test_dhtplay.py:454-455 — assertIn('-p', call_args) and assertIn('9999', call_args)\n- [x] AC-5: S16(c) asserts get_lan_ip() returns '127.0.0.1' (not raises NameError) when socket.socket() raises OSError — PASS: test_dhtplay.py:487-490 — patches socket.socket with OSError side_effect; asserts ip == '127.0.0.1'. dhtplay:100 initializes s=None; dhtplay:107-108 guards finally with if s is not None\n- [x] AC-6: S10 passes without webtorrent-cli installed (behavior-under-test is the resolution logic, not system state) — PASS: test_dhtplay.py:293-309 — both S10 tests patch dhtplay._executable and dhtplay.subprocess.run; test passes with webtorrent stripped from PATH\n- [x] AC-7: grep _find_stream_url dhtplay returns no matches after the change — PASS: grep _find_stream_url dhtplay exits with code 1 — no matches\n- [x] AC-8: get_lan_ip() still returns the correct IP on the happy path (ipconfig succeeds for en0) — PASS: test_dhtplay.py:464-470 — S16.test_ipconfig_success patches subprocess.run returning stdout='192.168.1.42\\n'; asserts ip == '192.168.1.42'. dhtplay:85-99 happy path unchanged\n- [x] AC-9: No test makes a real subprocess, network, or filesystem call; all external I/O is mocked — PASS: S13–S16 and refactored S10 are fully mocked. Pre-existing S12 calls subprocess.run([sys.executable, _SCRIPT, ...]) for CLI smoke tests, but S12 was outside this task's changed set and requires only the Python interpreter, not webtorrent or VLC\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- S10 refactored to mock dhtplay._executable and dhtplay.subprocess.run, preserving coverage of hardcoded-candidate-preferred-over-which logic without requiring webtorrent installed\n- _find_stream_url deleted entirely rather than deprecated — unreachable code with no callers and import threading removed with it\n- get_lan_ip() NameError fix: s = None initialized before try block; finally block guards with if s is not None: s.close()\n\n## Required Changes\n\nNone.\n"
   },
   "stages": {
-    "review": {
-      "status": "approved",
-      "approvedAt": "2026-06-20T22:40:37Z",
-      "startedAt": "2026-06-20T22:37:33Z"
+    "release": {
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-20T22:40:37Z"
     },
-    "design": {
+    "architecture": {
       "status": "skipped"
     },
     "implementation": {
@@ -439,21 +491,20 @@
       "approvedAt": "2026-06-20T22:37:32Z",
       "startedAt": "2026-06-20T22:31:30Z"
     },
+    "design": {
+      "status": "skipped"
+    },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-20T22:31:29Z",
       "startedAt": "2026-06-20T22:27:50Z"
     },
-    "release": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T22:40:37Z"
-    },
-    "architecture": {
-      "status": "skipped"
+    "review": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:40:37Z",
+      "startedAt": "2026-06-20T22:37:33Z"
     }
   },
-  "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-building-dhtplay-capability-test-matrix-01kvkj9nqz2k",
-  "worktreeBaseBranch": "main",
   "worktreeLastSyncedAt": "2026-06-20T22:40:37Z",
   "reviewPayload": {
     "verdict": "approve",

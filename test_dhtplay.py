@@ -285,19 +285,28 @@ class S09_WebtorrentNotFound(unittest.TestCase):
 
 
 # ===========================================================================
-# S10 — webtorrent is found on the system
+# S10 — find_webtorrent() resolution logic: hardcoded candidates before `which`
 # ===========================================================================
 class S10_WebtorrentFound(unittest.TestCase):
-    """CRITERIA: find_webtorrent() returns a non-None path when webtorrent-cli is installed."""
+    """CRITERIA: find_webtorrent() prefers hardcoded candidates over `which` fallback."""
 
-    def test_webtorrent_found(self):
-        path = find_webtorrent()
-        self.assertIsNotNone(path, "webtorrent-cli should be installed via 'npm install -g webtorrent-cli'")
+    def test_hardcoded_candidate_preferred(self):
+        # When a hardcoded candidate exists, it is returned without calling `which`
+        with patch("dhtplay._executable", side_effect=lambda p: p == "/opt/homebrew/bin/webtorrent"), \
+             patch("dhtplay.subprocess.run") as run_mock:
+            result = find_webtorrent()
+        self.assertEqual(result, "/opt/homebrew/bin/webtorrent")
+        run_mock.assert_not_called()
 
-    def test_webtorrent_is_executable(self):
-        path = find_webtorrent()
-        if path:
-            self.assertTrue(os.access(path, os.X_OK), f"{path} should be executable")
+    def test_which_fallback_used_when_no_candidates(self):
+        # When no hardcoded candidates are executable, `which` fallback is tried
+        run_result = MagicMock()
+        run_result.returncode = 0
+        run_result.stdout = "/usr/bin/webtorrent\n"
+        with patch("dhtplay._executable", return_value=False), \
+             patch("dhtplay.subprocess.run", return_value=run_result):
+            result = find_webtorrent()
+        self.assertEqual(result, "/usr/bin/webtorrent")
 
 
 # ===========================================================================
@@ -368,6 +377,117 @@ class S12_CLIEndToEnd(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0)
         self.assertIn("infohash", result.stdout)
+
+
+# ===========================================================================
+# S13 — --url flag prints a http:// URL containing the port number
+# ===========================================================================
+class S13_UrlFlag(unittest.TestCase):
+    """CRITERIA: --url prints http://<ip>:<port>/ to stdout and returns exit code 0."""
+
+    IH = "aabbccddee" * 4
+    WT = "/opt/homebrew/bin/webtorrent"
+
+    def test_url_flag_prints_http_url(self):
+        import io
+        from contextlib import redirect_stdout
+        proc_mock = MagicMock()
+        proc_mock.wait.return_value = None
+        popen_mock = MagicMock(return_value=proc_mock)
+        out = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", popen_mock), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             redirect_stdout(out):
+            rc = main([self.IH, "--url"])
+        self.assertEqual(rc, 0)
+        output = out.getvalue()
+        self.assertIn("http://", output)
+        self.assertIn("8000", output)
+
+
+# ===========================================================================
+# S14 — --url keyboard interrupt causes proc.terminate()
+# ===========================================================================
+class S14_UrlKeyboardInterrupt(unittest.TestCase):
+    """CRITERIA: KeyboardInterrupt from proc.wait() causes proc.terminate() to be called once."""
+
+    IH = "aabbccddee" * 4
+    WT = "/opt/homebrew/bin/webtorrent"
+
+    def test_keyboard_interrupt_calls_terminate(self):
+        import io
+        from contextlib import redirect_stdout
+        proc_mock = MagicMock()
+        proc_mock.wait.side_effect = KeyboardInterrupt
+        popen_mock = MagicMock(return_value=proc_mock)
+        out = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", popen_mock), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             patch("dhtplay.get_lan_ip", return_value="127.0.0.1"), \
+             redirect_stdout(out):
+            rc = main([self.IH, "--url"])
+        self.assertEqual(rc, 0)
+        proc_mock.terminate.assert_called_once()
+
+
+# ===========================================================================
+# S15 — --port flag value reaches the Popen command list
+# ===========================================================================
+class S15_PortFlag(unittest.TestCase):
+    """CRITERIA: integer passed via --port appears alongside -p in Popen call args."""
+
+    IH = "aabbccddee" * 4
+    WT = "/opt/homebrew/bin/webtorrent"
+
+    def test_port_value_in_popen_args(self):
+        import io
+        from contextlib import redirect_stdout
+        popen_mock = MagicMock()
+        out = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", popen_mock), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             redirect_stdout(out):
+            rc = main([self.IH, "--port", "9999"])
+        self.assertEqual(rc, 0)
+        call_args = popen_mock.call_args[0][0]
+        self.assertIn("-p", call_args)
+        self.assertIn("9999", call_args)
+
+
+# ===========================================================================
+# S16 — get_lan_ip() unit tests: ipconfig, socket fallback, OSError fallback
+# ===========================================================================
+class S16_GetLanIp(unittest.TestCase):
+    """CRITERIA: get_lan_ip() returns the correct IP for all three code paths."""
+
+    def test_ipconfig_success(self):
+        # ipconfig returns an IP for en0 — function returns that IP
+        result_mock = MagicMock()
+        result_mock.stdout = "192.168.1.42\n"
+        with patch("dhtplay.subprocess.run", return_value=result_mock):
+            ip = dhtplay.get_lan_ip()
+        self.assertEqual(ip, "192.168.1.42")
+
+    def test_socket_fallback_when_ipconfig_fails(self):
+        # All ipconfig calls return empty stdout — socket path succeeds
+        fail_result = MagicMock()
+        fail_result.stdout = ""
+        sock_mock = MagicMock()
+        sock_mock.getsockname.return_value = ("10.0.0.5", 0)
+        with patch("dhtplay.subprocess.run", return_value=fail_result), \
+             patch("socket.socket", return_value=sock_mock):
+            ip = dhtplay.get_lan_ip()
+        self.assertEqual(ip, "10.0.0.5")
+
+    def test_oserror_returns_localhost(self):
+        # All ipconfig calls fail; socket.socket() raises OSError — returns 127.0.0.1
+        fail_result = MagicMock()
+        fail_result.stdout = ""
+        with patch("dhtplay.subprocess.run", return_value=fail_result), \
+             patch("socket.socket", side_effect=OSError("no socket")):
+            ip = dhtplay.get_lan_ip()
+        self.assertEqual(ip, "127.0.0.1")
 
 
 # ---------------------------------------------------------------------------

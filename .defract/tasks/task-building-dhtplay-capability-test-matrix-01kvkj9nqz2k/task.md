@@ -14,7 +14,6 @@ defract:
   assignee: holynakamoto
 ---
 
-
 ## Story Brief
 
 # Building dhtplay capability test matrix
@@ -183,4 +182,44 @@ No security issues found in changed files.
 ## Required Changes
 
 None.
+
+## Release
+
+## Release Notes
+
+### What was built
+- Fixed `get_lan_ip()` NameError: initialized `s = None` before the try block and guarded `finally` with `if s is not None: s.close()`, so `socket.socket()` raising `OSError` now returns `"127.0.0.1"` cleanly
+- Removed dead `_find_stream_url` function and its `import threading` — no callers existed anywhere in the codebase
+- Refactored S10 to replace environment-coupled live `find_webtorrent()` calls with mock-based tests, preserving coverage of the hardcoded-candidate-preferred-over-`which` resolution logic without requiring webtorrent-cli to be installed
+- Added S13 (`--url` flag): asserts stdout contains `http://` and default port `8000`, exit code 0, all I/O mocked
+- Added S14 (`--url` keyboard interrupt): asserts `proc.terminate()` called exactly once after `KeyboardInterrupt` from `proc.wait()`, exit code 0
+- Added S15 (`--port` flag): asserts both `-p` and the port string appear in the `Popen` call args list
+- Added S16 (`get_lan_ip()` unit tests): three sub-tests covering ipconfig success path, socket fallback, and `OSError` fallback to `"127.0.0.1"`
+
+### Key decisions
+- S10 refactored to mock `dhtplay._executable` and `dhtplay.subprocess.run`, preserving coverage of hardcoded-candidate-preferred-over-which logic without requiring webtorrent installed
+- `_find_stream_url` deleted entirely rather than deprecated — unreachable code with no callers; `import threading` removed with it
+- `get_lan_ip()` NameError fix: `s = None` initialized before try block; `finally` block guards with `if s is not None: s.close()`
+
+### Changes by phase
+- **Phase 1: Fix defects and add missing test coverage** — Fixed `get_lan_ip()` NameError, removed dead `_find_stream_url`, refactored S10 to use mocks, added S13/S14/S15/S16. All 38 tests pass across 16 scenario classes on any machine regardless of webtorrent or VLC installation.
+
+## Verification
+
+### Production Build
+- `python3 -m py_compile dhtplay` — PASS
+
+### Review Reference
+- Approved by reviewer on 2026-06-20 — 9/9 acceptance criteria passed, all automated checks passed
+- Test suite: 38/38 tests pass across 16 scenario classes
+- Test suite (no webtorrent in PATH): 38/38 pass with webtorrent stripped from PATH
+- `grep _find_stream_url dhtplay`: exit code 1 — no matches
+
+### Release Checklist
+- [x] Approved review exists
+- [x] Production build passes
+- [x] Code committed and pushed
+- [x] Release notes prepared
+- [x] Stage content updated
+- [x] Completion event logged
 

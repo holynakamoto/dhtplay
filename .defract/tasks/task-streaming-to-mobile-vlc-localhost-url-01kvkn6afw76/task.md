@@ -3,7 +3,7 @@ defract:
   id: task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76
   type: bug
   status: active
-  stage: implementation
+  stage: review
   phase: 0
   total_phases: 1
   priority: normal
@@ -118,3 +118,24 @@ S13 currently asserts `self.assertIn("/0", output)` — this assertion must be r
 ### Dependencies
 
 No new Python dependencies. `qrencode` is an optional system tool (`brew install qrencode` on macOS); its absence must never cause a failure.
+
+## Implementation Notes
+
+## Phase 1: Fix URL output and add QR code
+
+### What was built
+
+**`dhtplay` changes:**
+- Added `import queue` and `import threading`
+- Added `_find_stream_url(proc, port, timeout=30)`: starts a daemon thread that reads `proc.stdout` line by line and puts the first URL matching `r'https?://\S*{port}\S*'` into a `queue.Queue`. Main thread calls `q.get(timeout=30)`, returning `None` on `queue.Empty`.
+- Added `_render_qr(url)`: calls `subprocess.run(["qrencode", "-t", "ansiutf8", url])`, catching `(OSError, FileNotFoundError)` silently.
+- Rewrote `--url` branch: launches webtorrent with `stdout=subprocess.PIPE, text=True`, calls `_find_stream_url`, substitutes `localhost`/`127.0.0.1` with LAN IP via `re.sub`, falls back to `http://{lan_ip}:{port}/` on timeout, prints URL, calls `_render_qr`, then preserves existing `proc.wait()` / `KeyboardInterrupt → proc.terminate()` path.
+
+**`test_dhtplay.py` changes:**
+- S13 rewritten: `test_url_flag_prints_http_url` mocks `proc_mock.stdout = iter(["Server running at: http://localhost:8888/Movie.mkv\n"])` and asserts output contains `192.168.1.100` and `/Movie.mkv` (not `localhost`). `test_url_flag_no_vlc` patches `_find_stream_url` directly to return `None` quickly.
+- S14 updated: added `patch("dhtplay._find_stream_url", return_value=None)` and `patch("dhtplay._render_qr")` to prevent the 30-second queue timeout (MagicMock's default `__iter__` yields nothing, so the reader exits immediately and the main thread would block).
+- S17 added: asserts `subprocess.run` is called with `["qrencode", "-t", "ansiutf8", "http://192.168.1.100:8888/Movie.mkv"]` when `_find_stream_url` returns `"http://localhost:8888/Movie.mkv"`.
+- S18 added: asserts exit code 0 and empty stderr when `subprocess.run` raises `FileNotFoundError`.
+
+### Test results
+41/41 passing. Runtime: 0.06s.

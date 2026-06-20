@@ -1,11 +1,11 @@
 {
   "id": "task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
   "status": "active",
-  "stage": "implementation",
-  "phase": 0,
+  "stage": "review",
+  "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T23:17:27Z",
-  "updatedAt": "2026-06-20T23:23:53Z",
+  "updatedAt": "2026-06-20T23:32:47Z",
   "events": [
     {
       "base_branch": "main",
@@ -165,6 +165,191 @@
       "phase": 1,
       "timestamp": "2026-06-20T23:23:53Z",
       "type": "progress_report"
+    },
+    {
+      "description": "Implementing core changes to dhtplay and test_dhtplay.py",
+      "percentage": 20,
+      "phase": 1,
+      "timestamp": "2026-06-20T23:28:08Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running verification checks",
+      "percentage": 60,
+      "phase": 1,
+      "timestamp": "2026-06-20T23:29:09Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running full check suite",
+      "percentage": 80,
+      "phase": 1,
+      "timestamp": "2026-06-20T23:29:21Z",
+      "type": "progress_report"
+    },
+    {
+      "details": "All 41 tests pass. S13 updated (2 tests), S14 updated (1 test), S17 added (1 test), S18 added (1 test). S01-S16 (except S13/S14 which were updated) pass unchanged.",
+      "failed": 0,
+      "passed": 41,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-20T23:29:25Z",
+      "type": "test_results"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Implementation: S14 and S13 test_url_flag_no_vlc now patch _find_stream_url and _render_qr directly to avoid a 30-second queue timeout in tests that do not exercise URL scanning.",
+      "phase": 1,
+      "rationale": "MagicMock's default __iter__ yields nothing, so the reader daemon thread exits immediately without putting anything in the queue — the main thread would then wait the full 30-second timeout before falling back. Patching _find_stream_url in non-scanning tests keeps the suite fast without changing the observable behavior being verified.",
+      "timestamp": "2026-06-20T23:29:31Z",
+      "type": "decision"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Implementation: added text=True to subprocess.Popen in the --url branch so proc.stdout yields str lines, not bytes, which the reader thread can pattern-match without a decode step.",
+      "phase": 1,
+      "rationale": "Avoids a bytes/str type check in _find_stream_url; consistent with how the test mocks set proc_mock.stdout = iter([str, ...]).",
+      "timestamp": "2026-06-20T23:29:34Z",
+      "type": "decision"
+    },
+    {
+      "description": "Phase 1 implementation complete — awaiting approval",
+      "percentage": 100,
+      "phase": 1,
+      "timestamp": "2026-06-20T23:29:38Z",
+      "type": "progress_report"
+    },
+    {
+      "change_summary": "Phase 1 complete: Fix URL output and add QR code",
+      "revision": 1,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T23:29:52Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "artifacts_created": [
+        "dhtplay",
+        "test_dhtplay.py"
+      ],
+      "phase": 0,
+      "summary": "Rewrote --url branch to pipe webtorrent stdout through a background daemon thread, scan for the real stream URL using a port-anchored regex, substitute localhost with the LAN IP, print the result, and optionally render a QR code via qrencode. Updated S13 and added S17/S18. All 41 tests pass.",
+      "timestamp": "2026-06-20T23:29:56Z",
+      "type": "phase_completed"
+    },
+    {
+      "items": [
+        {
+          "description": "Run `./dhtplay --help` and confirm `--url` and `--port` appear in the usage output."
+        },
+        {
+          "description": "Run `./dhtplay <infohash> --url` and verify the printed URL begins with `http://` and contains your machine's LAN IP (not `localhost` or `127.0.0.1`)."
+        },
+        {
+          "description": "Open the printed URL in mobile VLC (Media → Open Network Stream) on a phone connected to the same Wi-Fi and confirm the stream loads without a 404."
+        },
+        {
+          "description": "If `qrencode` is installed (`brew install qrencode`), run `./dhtplay <infohash> --url` and confirm a scannable QR code appears in the terminal below the URL."
+        },
+        {
+          "description": "If `qrencode` is NOT installed, run `./dhtplay <infohash> --url` and confirm the tool exits cleanly with no error message and exit code 0."
+        },
+        {
+          "description": "Run `./dhtplay <infohash> --url --port 9999` and confirm the printed URL contains port `9999`."
+        },
+        {
+          "description": "While streaming via `--url`, press `Ctrl-C` and confirm the process terminates cleanly (no traceback, shell prompt returns)."
+        }
+      ],
+      "phase": 0,
+      "phase_title": "Fix URL output and add QR code",
+      "timestamp": "2026-06-20T23:30:05Z",
+      "type": "manual_tests"
+    },
+    {
+      "agent_phase": 1,
+      "phase_title": "Fix URL output and add QR code",
+      "server_phase": 0,
+      "timestamp": "2026-06-20T23:30:09Z",
+      "type": "phase_drift_detected"
+    },
+    {
+      "phase": 0,
+      "phase_title": "Fix URL output and add QR code",
+      "timestamp": "2026-06-20T23:30:09Z",
+      "type": "phase_awaiting_approval",
+      "worktree_head": "cc36dffac2c7fe07cca92d41c461eaf3c9944891",
+      "worktree_status_digest": "7061d918d7802917356261ea01251ea6f749839df34b1a9c6c97cc307066cedf"
+    },
+    {
+      "approved_by": "user",
+      "phase": 0,
+      "phase_title": "Fix URL output and add QR code",
+      "timestamp": "2026-06-20T23:32:46Z",
+      "type": "phase_approved"
+    },
+    {
+      "checked_indices": [],
+      "phase": 0,
+      "timestamp": "2026-06-20T23:32:46Z",
+      "type": "manual_tests_checks_persisted"
+    },
+    {
+      "stage": "implementation",
+      "summary": "All phases approved — implementation ready for review.",
+      "timestamp": "2026-06-20T23:32:46Z",
+      "type": "stage_work_complete",
+      "worktree_head": "08affa984b8e466ec72a2c8f738f9690717f9c4f",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T23:32:47Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T23:32:46Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "6db75a6dcf77b602752d3b39b8f0a6ff1fc7a42e",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "implementation",
+      "stale_worktree_head": "08affa984b8e466ec72a2c8f738f9690717f9c4f",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T23:32:47Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T23:32:47Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "implementation",
+      "timestamp": "2026-06-20T23:32:47Z",
+      "to": "review",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T23:32:47Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvkp2cz0e9rg7z99stgdp4se",
+      "stage": "review",
+      "timestamp": "2026-06-20T23:32:47Z",
+      "type": "stage_agent_started"
     }
   ],
   "needsArchitecture": false,
@@ -182,26 +367,32 @@
     "rationale": "Primary objective is fixing broken behavior (hardcoded /0 path is dead). QR code is a small additive enhancement on the same code path. No UI changes (CLI tool, skip design). Work is contained to 2 files, single function rewrite — no new system boundaries (skip architecture)."
   },
   "stageApprovals": {
+    "implementation": "2026-06-20T23:32:46Z",
     "scope": "2026-06-20T23:23:32Z"
   },
+  "stageContent": {
+    "implementation": "## Phase 1: Fix URL output and add QR code\n\n### What was built\n\n**`dhtplay` changes:**\n- Added `import queue` and `import threading`\n- Added `_find_stream_url(proc, port, timeout=30)`: starts a daemon thread that reads `proc.stdout` line by line and puts the first URL matching `r'https?://\\S*{port}\\S*'` into a `queue.Queue`. Main thread calls `q.get(timeout=30)`, returning `None` on `queue.Empty`.\n- Added `_render_qr(url)`: calls `subprocess.run([\"qrencode\", \"-t\", \"ansiutf8\", url])`, catching `(OSError, FileNotFoundError)` silently.\n- Rewrote `--url` branch: launches webtorrent with `stdout=subprocess.PIPE, text=True`, calls `_find_stream_url`, substitutes `localhost`/`127.0.0.1` with LAN IP via `re.sub`, falls back to `http://{lan_ip}:{port}/` on timeout, prints URL, calls `_render_qr`, then preserves existing `proc.wait()` / `KeyboardInterrupt → proc.terminate()` path.\n\n**`test_dhtplay.py` changes:**\n- S13 rewritten: `test_url_flag_prints_http_url` mocks `proc_mock.stdout = iter([\"Server running at: http://localhost:8888/Movie.mkv\\n\"])` and asserts output contains `192.168.1.100` and `/Movie.mkv` (not `localhost`). `test_url_flag_no_vlc` patches `_find_stream_url` directly to return `None` quickly.\n- S14 updated: added `patch(\"dhtplay._find_stream_url\", return_value=None)` and `patch(\"dhtplay._render_qr\")` to prevent the 30-second queue timeout (MagicMock's default `__iter__` yields nothing, so the reader exits immediately and the main thread would block).\n- S17 added: asserts `subprocess.run` is called with `[\"qrencode\", \"-t\", \"ansiutf8\", \"http://192.168.1.100:8888/Movie.mkv\"]` when `_find_stream_url` returns `\"http://localhost:8888/Movie.mkv\"`.\n- S18 added: asserts exit code 0 and empty stderr when `subprocess.run` raises `FileNotFoundError`.\n\n### Test results\n41/41 passing. Runtime: 0.06s."
+  },
   "stages": {
+    "architecture": {
+      "status": "skipped"
+    },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-20T23:23:32Z",
       "startedAt": "2026-06-20T23:18:05Z"
     },
+    "implementation": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T23:32:46Z",
+      "startedAt": "2026-06-20T23:23:33Z"
+    },
     "design": {
       "status": "skipped"
     },
-    "architecture": {
-      "status": "skipped"
-    },
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T23:23:33Z"
-    },
     "review": {
-      "status": "not_started"
+      "status": "in_progress",
+      "startedAt": "2026-06-20T23:32:47Z"
     },
     "release": {
       "status": "not_started"
@@ -209,5 +400,5 @@
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
   "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-20T23:23:33Z"
+  "worktreeLastSyncedAt": "2026-06-20T23:32:47Z"
 }

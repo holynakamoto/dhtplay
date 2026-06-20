@@ -1,0 +1,138 @@
+{
+  "id": "task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
+  "status": "active",
+  "stage": "scope",
+  "phase": 0,
+  "totalPhases": 1,
+  "createdAt": "2026-06-20T23:17:27Z",
+  "updatedAt": "2026-06-20T23:21:36Z",
+  "events": [
+    {
+      "base_branch": "main",
+      "branch": "feature/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
+      "path": "/Users/nickmoore/dhtplay/.defract-worktrees/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
+      "timestamp": "2026-06-20T23:17:27Z",
+      "type": "worktree_created"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvkn6a50xcmprd94dh63yka1",
+      "stage": "scope",
+      "timestamp": "2026-06-20T23:17:27Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "change_summary": "Intent check: fix --url to capture real stream URL and optionally show QR code",
+      "revision": 1,
+      "timestamp": "2026-06-20T23:17:52Z",
+      "type": "scope_update"
+    },
+    {
+      "stage": "scope",
+      "summary": "Intent check pushed: fix --url to read webtorrent's real stream URL, swap localhost for LAN IP, and optionally render a QR code via qrencode.",
+      "timestamp": "2026-06-20T23:17:55Z",
+      "type": "stage_work_complete",
+      "worktree_head": "7bc9ab9c36b7d563717407dc41751ba1cac491b0",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T23:18:05Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "approve_initial",
+      "session_id": "01kvkn7f21m9ta18045xy7xtgn",
+      "stage": "scope",
+      "timestamp": "2026-06-20T23:18:05Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvkn6a50xcmprd94dh63yka1",
+      "timed_out": false,
+      "timestamp": "2026-06-20T23:18:05Z",
+      "type": "agent_exited"
+    },
+    {
+      "change_summary": "Full scope: fix --url URL output by reading webtorrent stdout, add optional QR code via qrencode",
+      "revision": 2,
+      "timestamp": "2026-06-20T23:21:13Z",
+      "type": "scope_update"
+    },
+    {
+      "rationale": "Primary objective is fixing broken behavior (hardcoded /0 path is dead). QR code is a small additive enhancement on the same code path. No UI changes (CLI tool, skip design). Work is contained to 2 files, single function rewrite — no new system boundaries (skip architecture).",
+      "stages": [
+        "scope",
+        "implementation",
+        "review",
+        "release"
+      ],
+      "template": "bug-fix",
+      "tier": "standard",
+      "timestamp": "2026-06-20T23:21:19Z",
+      "type": "workflow_classified"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Use a background daemon thread + queue.Queue to scan webtorrent stdout, with a 30-second timeout before falling back to the root URL.",
+      "rationale": "Piping stdout requires continuous draining to prevent deadlock. A daemon thread drains the pipe while the main thread waits on the queue with a timeout — this keeps the main thread responsive and the fallback clean without adding a dependency.",
+      "timestamp": "2026-06-20T23:21:23Z",
+      "type": "decision"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Match any URL containing the port number (not a fixed path pattern) in the webtorrent stdout scan.",
+      "rationale": "webtorrent-cli has changed its stdout path format across versions (was /0, now serves at /filename.ext or similar). The port number is the only stable anchor across versions. A broad regex prevents this fix from breaking again when webtorrent updates.",
+      "timestamp": "2026-06-20T23:21:28Z",
+      "type": "decision"
+    },
+    {
+      "stage": "scope",
+      "summary": "Full scope written as revision 2. Single phase: rewrite the --url branch to pipe webtorrent stdout, scan for the real URL via a background thread with a 30-second fallback, swap localhost for the LAN IP, and optionally render a QR code via qrencode. Test updates: S13 reworked to mock stdout iterator, S17/S18 added for QR present/absent. Workflow classified as bug-fix/standard with no design or architecture stages.",
+      "timestamp": "2026-06-20T23:21:36Z",
+      "type": "stage_work_complete",
+      "worktree_head": "7bc9ab9c36b7d563717407dc41751ba1cac491b0",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "needsArchitecture": false,
+  "needsDesign": false,
+  "workflow": {
+    "tier": "standard",
+    "template": "bug-fix",
+    "stages": [
+      "scope",
+      "implementation",
+      "review",
+      "release"
+    ],
+    "classifiedBy": "scope-agent",
+    "rationale": "Primary objective is fixing broken behavior (hardcoded /0 path is dead). QR code is a small additive enhancement on the same code path. No UI changes (CLI tool, skip design). Work is contained to 2 files, single function rewrite — no new system boundaries (skip architecture)."
+  },
+  "stages": {
+    "scope": {
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-20T23:18:05Z"
+    },
+    "review": {
+      "status": "not_started"
+    },
+    "architecture": {
+      "status": "skipped"
+    },
+    "release": {
+      "status": "not_started"
+    },
+    "design": {
+      "status": "skipped"
+    },
+    "implementation": {
+      "status": "not_started"
+    }
+  },
+  "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
+  "worktreeBaseBranch": "main",
+  "worktreeLastSyncedAt": "2026-06-20T23:18:05Z"
+}

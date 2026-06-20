@@ -1,12 +1,20 @@
 {
-  "tasks_since_consolidation": 3,
-  "consolidation_history": [],
+  "tasks_since_consolidation": 0,
+  "consolidation_history": [
+    {
+      "entriesArchived": 0,
+      "entriesCreated": 5,
+      "entriesUpdated": 0,
+      "taskId": "task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
+      "timestamp": "2026-06-20T23:39:26.254565+00:00"
+    }
+  ],
   "last_emit_hashes": {
-    "builder-preferences.md": "9c7a4c5961e1084bbc1e238e10d9c498b4cbdcbf46833c8835eb8c1b0018e2fc",
-    "project-facts.md": "aec51a7dc0defb877c4fed510163f202d46255bb8fbb6333e01e017049c0e396",
-    "decisions.md": "1cf94ddf1116c0006271e80df79ecf16e47f6f42d659660757781d6c8c4fa1cf",
-    "mistakes.md": "c7c770a2bf206f69ce7d223be34eed35de91c522e272963633b739e9785b374d",
-    "workflows.md": "0cda5930aa930cfd40f6ec35e17dbaaa70d9d2e5c6fd8daa967d7f24ae4f9a8e"
+    "project-facts.md": "1e49e07c6fa2f7adea87135151a8043dbe031325c0b6839784f8d2bce0072593",
+    "mistakes.md": "6159153e36291c4cb2e40f6466b4ee1159eef2651d55062ffff58bc061969fc5",
+    "decisions.md": "63ace787fb58437561edcd7ce4b136455bc335d5452da30bb9be6037aff91ac1",
+    "workflows.md": "f8cb1f1b7f9ebb7e336be25e29bb30516e779429bc5a7102b7243177c1406793",
+    "builder-preferences.md": "1770be583c81276593e6eb63d01a1b5e92b6bc4eeccc9c3cdbdaa9c87fc04ff5"
   },
   "pending_external_edits": []
 }

@@ -6,10 +6,10 @@ This project uses [defract](https://defract.dev) for structured AI-assisted deve
 
 | Task | Stage | Status |
 |------|-------|--------|
-| Streaming to mobile VLC: localhost URL too long | scope | active |
 | Building dhtplay capability test matrix | release | completed |
 | Shortening --url output to http://{LANIP}:8888 | release | completed |
 | Stream to mobile VLC via URL, no local VLC | release | completed |
+| Streaming to mobile VLC: fix URL output and add QR code | release | completed |
 
 
 ## Reading without defract

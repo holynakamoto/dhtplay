@@ -1,11 +1,11 @@
 {
   "id": "task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg",
   "status": "active",
-  "stage": "scope",
+  "stage": "implementation",
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-20T22:46:07Z",
-  "updatedAt": "2026-06-20T22:46:47Z",
+  "updatedAt": "2026-06-20T22:52:47Z",
   "events": [
     {
       "base_branch": "main",
@@ -34,29 +34,134 @@
       "type": "stage_work_complete",
       "worktree_head": "ce533216cf8a88f7d694c74a52fce2684fbe4b43",
       "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T22:47:55Z",
+      "type": "worktree_synced"
+    },
+    {
+      "mode": "approve_initial",
+      "session_id": "01kvkkg7r2b8qms9e8116j07fw",
+      "stage": "scope",
+      "timestamp": "2026-06-20T22:47:55Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "change_summary": "Full scope: single-phase fix removing --vlc from --url path, updating printed URL to /0, and updating help text + tests",
+      "revision": 2,
+      "timestamp": "2026-06-20T22:49:57Z",
+      "type": "scope_update"
+    },
+    {
+      "rationale": "Bug fix correcting --url flag behavior — no UI changes (skip design), well-contained to 2 files with no new system boundaries (skip architecture). Three surgical line-level edits in dhtplay plus test updates in test_dhtplay.py.",
+      "stages": [
+        "scope",
+        "implementation",
+        "review",
+        "release"
+      ],
+      "template": "bug-fix",
+      "tier": "trivial",
+      "timestamp": "2026-06-20T22:50:02Z",
+      "type": "workflow_classified"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Hardcode /0 as file path rather than parsing webtorrent stdout",
+      "rationale": "The approved intent check specifies the URL should end in /0. Parsing webtorrent's stdout for the actual filename (as the old _find_stream_url function was designed to do) would require capturing stdout during the HTTP server run, complicating the process lifecycle. Appending /0 is simpler, sufficient for the single-file common case, and consistent with webtorrent-cli's numeric index path convention.",
+      "timestamp": "2026-06-20T22:50:13Z",
+      "type": "decision"
+    },
+    {
+      "stage": "scope",
+      "summary": "Full scope written as revision 2. Single phase, trivial bug-fix workflow. Three line-level changes in dhtplay (remove --vlc from --url command, append /0 to printed URL, update help text) plus two test additions in test_dhtplay.py. Key decision: hardcode /0 path rather than parsing webtorrent stdout.",
+      "timestamp": "2026-06-20T22:50:20Z",
+      "type": "stage_work_complete",
+      "worktree_head": "fd9db9947f846aa41f05c2297c04d9819375b5cc",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:52:47Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "actor": null,
+      "stage": "scope",
+      "timestamp": "2026-06-20T22:52:47Z",
+      "type": "stage_approved"
+    },
+    {
+      "from": "scope",
+      "timestamp": "2026-06-20T22:52:47Z",
+      "to": "implementation",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:52:47Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvkks4npq2bpfz64wzkhwjtm",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:52:47Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvkkg7r2b8qms9e8116j07fw",
+      "timed_out": false,
+      "timestamp": "2026-06-20T22:52:47Z",
+      "type": "agent_exited"
     }
   ],
+  "needsArchitecture": false,
+  "needsDesign": false,
+  "workflow": {
+    "tier": "trivial",
+    "template": "bug-fix",
+    "stages": [
+      "scope",
+      "implementation",
+      "review",
+      "release"
+    ],
+    "classifiedBy": "scope-agent",
+    "rationale": "Bug fix correcting --url flag behavior — no UI changes (skip design), well-contained to 2 files with no new system boundaries (skip architecture). Three surgical line-level edits in dhtplay plus test updates in test_dhtplay.py."
+  },
+  "stageApprovals": {
+    "scope": "2026-06-20T22:52:47Z"
+  },
   "stages": {
+    "architecture": {
+      "status": "skipped"
+    },
     "implementation": {
-      "status": "not_started"
-    },
-    "scope": {
-      "status": "awaiting_approval",
-      "startedAt": "2026-06-20T22:46:08Z"
-    },
-    "design": {
-      "status": "not_started"
+      "status": "in_progress",
+      "startedAt": "2026-06-20T22:52:47Z"
     },
     "review": {
       "status": "not_started"
     },
-    "architecture": {
-      "status": "not_started"
+    "design": {
+      "status": "skipped"
+    },
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:52:47Z",
+      "startedAt": "2026-06-20T22:47:55Z"
     },
     "release": {
       "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg",
-  "worktreeBaseBranch": "main"
+  "worktreeBaseBranch": "main",
+  "worktreeLastSyncedAt": "2026-06-20T22:52:47Z"
 }

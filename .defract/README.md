@@ -6,7 +6,8 @@ This project uses [defract](https://defract.dev) for structured AI-assisted deve
 
 | Task | Stage | Status |
 |------|-------|--------|
-| Building dhtplay capability test matrix | scope | active |
+| Stream to mobile VLC via URL, no local VLC | scope | active |
+| Building dhtplay capability test matrix | release | completed |
 
 
 ## Reading without defract

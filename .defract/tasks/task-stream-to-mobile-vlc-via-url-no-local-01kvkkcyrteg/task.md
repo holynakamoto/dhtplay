@@ -3,7 +3,7 @@ defract:
   id: task-stream-to-mobile-vlc-via-url-no-local-01kvkkcyrteg
   type: bug
   status: active
-  stage: scope
+  stage: implementation
   phase: 0
   total_phases: 1
   priority: normal
@@ -14,7 +14,10 @@ defract:
   assignee: holynakamoto
 ---
 
+
 ## Story Brief
+
+# Stream to mobile VLC via URL, no local VLC
 
 # Stream to mobile VLC via URL, no local VLC
 
@@ -29,8 +32,74 @@ When a user runs `dhtplay` with the `--url` flag, the tool currently also opens 
 - Mobile VLC's "Open Network Stream" can play the URL directly without extra steps
 - The `--url` help text accurately describes the new behavior (HTTP-only, no local player)
 
+## Phase Outcomes
+
+- **Phase 1: Fix the --url streaming path** — Users running `dhtplay --url` get a URL they can paste directly into mobile VLC and play immediately, without the local machine also opening a media player.
+
 ## Out of Scope
 
 - Letting the user choose which file index to stream when a torrent contains multiple files
 - Any changes to the default `dhtplay` behavior (without `--url`)
 - Auto-discovery or mDNS broadcasting of the stream URL to nearby devices
+
+## Scope Summary
+
+**Size:** 4 requirements, 6 acceptance criteria, 1 implementation phase
+**Key decisions:**
+- Hardcode `/0` as the file index path rather than parsing webtorrent's stdout for the actual filename — simpler and sufficient for the single-file use case
+- Remove `--vlc` from the webtorrent command in the `--url` branch only; all non-`--url` behavior is untouched
+**Biggest risk:** Webtorrent's HTTP server path format for `/0` should match what webtorrent-cli actually serves — worth verifying against a live torrent since the unit tests cannot confirm the server-side path convention.
+
+## Context
+
+The `--url` flag is intended for remote streaming: the user runs the tool on one machine and plays the stream on another device such as mobile VLC. Currently the `--url` branch in `main()` builds `wt_cmd_http` with `--vlc` included (line 185 of `dhtplay`), which causes webtorrent to open VLC locally as well. The printed URL also points to the root `/` listing rather than a specific file, requiring the remote user to navigate the listing before playback begins.
+
+The fix is surgical: remove `--vlc` from the command list in the `--url` branch, update the printed URL from `/{port}/` to `/{port}/0`, and update the `--url` help text. Tests S13 and S14 cover the `--url` path and require corresponding updates.
+
+## Requirements
+
+### Behavior
+
+- R1: When `--url` is passed, webtorrent is launched without the `--vlc` flag so no local media player opens.
+- R2: The URL printed to stdout ends with `/0`, pointing directly to the first file served by the HTTP streaming server (e.g. `http://192.168.1.100:8000/0`).
+- R3: All existing behavior when `--url` is NOT passed remains unchanged — webtorrent still receives `--vlc` on the default path.
+
+### Documentation
+
+- R4: The `--url` argument's help text no longer claims VLC opens locally; it describes HTTP-only streaming for remote use.
+
+## Acceptance Criteria
+
+- [ ] Running `dhtplay <infohash> --url` calls `subprocess.Popen` with a command that does NOT contain `--vlc`; verified by inspecting `popen_mock.call_args` in S13.
+- [ ] The URL printed to stdout by `dhtplay <infohash> --url` ends with `/0` (e.g. `http://192.168.1.100:8000/0`); verified by updated S13 assertion.
+- [ ] Running `dhtplay <infohash>` (without `--url`) still calls `subprocess.Popen` with `--vlc` in the args; verified by S11 tests remaining unchanged and passing.
+- [ ] A new test assertion in S13 (or a new S17 scenario) asserts that `--vlc` is absent from the Popen call args when `--url` is active.
+- [ ] `./dhtplay --help` output for `--url` contains no reference to VLC opening locally; verified by `./dhtplay --help | grep -A3 '\-\-url'`.
+- [ ] `python3 test_dhtplay.py` exits 0 with all tests passing.
+
+## Implementation Phases
+
+### Phase 1: Fix the --url streaming path
+**Scope:** Remove `--vlc` from the webtorrent command used in the `--url` branch, update the printed URL to include `/0`, update the `--url` help text, and update S13 to match the corrected behavior.
+**Files:**
+- `dhtplay` — remove `--vlc` from `wt_cmd_http` (line 185); change printed URL suffix from `/` to `/0` (line 186); update `--url` help string (lines 143–145)
+- `test_dhtplay.py` — update `S13_UrlFlag.test_url_flag_prints_http_url` to assert the output contains `/0`; add `test_url_flag_no_vlc` asserting `--vlc` is absent from Popen call args when `--url` is passed
+**Verification:**
+- [ ] `python3 test_dhtplay.py` exits 0 with all scenarios passing
+- [ ] `grep -- '--vlc' dhtplay` returns only the non-`--url` command line (the `wt_cmd` list, currently line 181), confirming `--vlc` is absent from the `--url` branch
+- [ ] `./dhtplay --help | grep -A3 '\-\-url'` does not contain "VLC also opens locally"
+**Estimated effort:** Small
+
+## Edge Cases
+
+- Multi-file torrent: the `/0` path returns the first file only; other files at `/1`, `/2`, etc. are not addressed — file selection is out of scope for this task.
+- `--url --port 9999`: the printed URL should be `http://<ip>:9999/0`; the port propagation to both the Popen args and the printed URL is covered by the existing S15 test pattern.
+- `--url` combined with `--dry-run`: `--dry-run` exits at line 167 before the `--url` branch at line 183 is reached — behavior is unchanged and requires no new handling.
+
+## Technical Notes
+
+The `--url` branch in `main()` (lines 183–197 of `dhtplay`) currently builds `wt_cmd_http` with the same flags as the default `wt_cmd`, including `--vlc`. The fix is to omit `--vlc` from that list only. No threading, no stdout capture, and no changes to `get_lan_ip()` are required.
+
+The project profile notes a `_find_stream_url` function that was intended to parse webtorrent's stdout for the actual filename URL — this function does not appear in the current file. Appending `/0` to the root URL is the correct approach per the approved intent check and avoids stdout capture complexity.
+
+The current `--url` help string (lines 143–145) reads: "print a remote-accessible stream URL and start the HTTP server (VLC also opens locally; open the printed URL on another machine via Media → Open Network Stream)". The replacement should convey that only the HTTP server starts and the URL points directly to the first stream file.

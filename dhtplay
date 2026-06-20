@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+"""dhtplay — stream a BitTorrent infohash via DHT in VLC."""
+
+import argparse
+import base64
+import re
+import socket
+import subprocess
+import sys
+import threading
+from urllib.parse import quote
+
+TRACKERS = [
+    "udp://tracker.opentrackr.org:1337/announce",
+    "udp://open.tracker.cl:1337/announce",
+    "udp://tracker.openbittorrent.com:6969/announce",
+    "udp://tracker.torrent.eu.org:451/announce",
+]
+
+WEBTORRENT_CANDIDATES = [
+    "/opt/homebrew/bin/webtorrent",
+    "/usr/local/bin/webtorrent",
+]
+
+
+def parse_infohash(raw):
+    """Return normalised lowercase hex infohash, or raise ValueError."""
+    s = raw.strip()
+
+    # Accept a full magnet URI and pull out the btih value
+    if s.lower().startswith("magnet:"):
+        m = re.search(r'urn:btih:([A-Za-z0-9]+)', s, re.IGNORECASE)
+        if not m:
+            raise ValueError("cannot find urn:btih in magnet URI")
+        s = m.group(1)
+
+    # 40-char hex (SHA-1 v1)
+    if re.fullmatch(r'[0-9A-Fa-f]{40}', s):
+        return s.lower()
+
+    # 32-char base32 (BitTorrent often encodes the 20-byte SHA-1 in base32)
+    if re.fullmatch(r'[A-Za-z2-7]{32}', s):
+        try:
+            return base64.b32decode(s.upper()).hex()
+        except Exception:
+            raise ValueError(f"base32 decode failed for {s!r}")
+
+    raise ValueError(
+        f"unrecognised infohash {s!r} — expected 40 hex chars or 32 base32 chars"
+    )
+
+
+def build_magnet(ih_hex, *, trackers=(), display_name=None):
+    """Return a magnet URI string."""
+    parts = [f"magnet:?xt=urn:btih:{ih_hex}"]
+    if display_name:
+        parts.append(f"dn={quote(display_name)}")
+    for tr in trackers:
+        parts.append(f"tr={quote(tr, safe=':/')}")
+    return "&".join(parts)
+
+
+def find_webtorrent(override=None):
+    """Return path to webtorrent executable, or None."""
+    if override:
+        return override if _executable(override) else None
+    for path in WEBTORRENT_CANDIDATES:
+        if _executable(path):
+            return path
+    try:
+        r = subprocess.run(["which", "webtorrent"], capture_output=True, text=True)
+        if r.returncode == 0:
+            p = r.stdout.strip()
+            if p:
+                return p
+    except OSError:
+        pass
+    return None
+
+
+def _executable(path):
+    import os
+    return os.path.isfile(path) and os.access(path, os.X_OK)
+
+
+def get_lan_ip():
+    """Return the LAN IP of this machine, or '127.0.0.1' as fallback."""
+    # On macOS, query physical interfaces directly to avoid VPN tunnels winning
+    # the routing decision when using the UDP socket trick.
+    for iface in ("en0", "en1", "en2"):
+        try:
+            result = subprocess.run(
+                ["ipconfig", "getifaddr", iface],
+                capture_output=True, text=True, timeout=2,
+            )
+            ip = result.stdout.strip()
+            if ip:
+                return ip
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except OSError:
+        return "127.0.0.1"
+    finally:
+        s.close()
+
+
+def _find_stream_url(proc, port, timeout=30):
+    """
+    Read proc.stdout looking for the URL webtorrent passes to VLC.
+    Returns the full path (e.g. '/Movie.mkv') or None if not found within timeout.
+    webtorrent prints a line like:
+      Opening ... http://localhost:PORT/filename  (or similar)
+    """
+    url_re = re.compile(r'http://localhost:' + str(port) + r'(/\S*)')
+    result = [None]
+    done = threading.Event()
+
+    def _scan():
+        for line in proc.stdout:
+            m = url_re.search(line)
+            if m:
+                result[0] = m.group(1)
+                done.set()
+                # drain the rest so the process doesn't block on a full pipe
+                for _ in proc.stdout:
+                    pass
+                return
+        done.set()
+
+    t = threading.Thread(target=_scan, daemon=True)
+    t.start()
+    done.wait(timeout=timeout)
+    return result[0]
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(
+        prog="dhtplay",
+        description="Play a BitTorrent infohash via DHT in VLC",
+    )
+    ap.add_argument(
+        "infohash",
+        help="40-hex or 32-base32 infohash, or a full magnet URI",
+    )
+    tracker_grp = ap.add_mutually_exclusive_group()
+    tracker_grp.add_argument(
+        "--trackers",
+        dest="trackers",
+        action="store_true",
+        default=True,
+        help="include common public trackers in the magnet URI (default)",
+    )
+    tracker_grp.add_argument(
+        "--no-trackers",
+        dest="trackers",
+        action="store_false",
+        help="omit trackers from the magnet URI",
+    )
+    ap.add_argument("--name", "-n", metavar="TITLE", help="display name (dn=) for the torrent")
+    ap.add_argument(
+        "--dry-run", "-d",
+        action="store_true",
+        help="print the magnet URI and exit without opening VLC",
+    )
+    ap.add_argument("--webtorrent", metavar="PATH", help="path to webtorrent executable")
+    ap.add_argument(
+        "--url", "-u",
+        action="store_true",
+        help="print a remote-accessible stream URL and start the HTTP server (VLC also opens locally; open the printed URL on another machine via Media → Open Network Stream)",
+    )
+    ap.add_argument(
+        "--port", "-p",
+        type=int,
+        default=8000,
+        metavar="PORT",
+        help="HTTP streaming server port (default: 8000)",
+    )
+
+    args = ap.parse_args(argv)
+
+    # --- validate / normalise -------------------------------------------------
+    try:
+        ih_hex = parse_infohash(args.infohash)
+    except ValueError as exc:
+        ap.error(str(exc))
+
+    # --- build URI ------------------------------------------------------------
+    trackers = TRACKERS if args.trackers else []
+    magnet = build_magnet(ih_hex, trackers=trackers, display_name=args.name)
+
+    if args.dry_run:
+        print(magnet)
+        return 0
+
+    # --- locate webtorrent ----------------------------------------------------
+    wt = find_webtorrent(args.webtorrent)
+    if not wt:
+        print(
+            "dhtplay: webtorrent not found — install with:  npm install -g webtorrent-cli",
+            file=sys.stderr,
+        )
+        return 2
+
+    # --- launch ---------------------------------------------------------------
+    wt_cmd = [wt, magnet, "--vlc", "-p", str(args.port)]
+
+    if args.url:
+        lan_ip = get_lan_ip()
+        wt_cmd_http = [wt, magnet, "--vlc", "-p", str(args.port)]
+        print(f"▶  http://{lan_ip}:{args.port}/")
+        try:
+            proc = subprocess.Popen(wt_cmd_http)
+        except OSError as exc:
+            print(f"dhtplay: failed to launch webtorrent: {exc}", file=sys.stderr)
+            return 3
+
+        try:
+            proc.wait()
+        except KeyboardInterrupt:
+            proc.terminate()
+        return 0
+
+    try:
+        subprocess.Popen(wt_cmd)
+    except OSError as exc:
+        print(f"dhtplay: failed to launch webtorrent: {exc}", file=sys.stderr)
+        return 3
+
+    print(f"▶  {magnet}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

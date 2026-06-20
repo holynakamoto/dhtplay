@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "generator": "defract-design-system-extractor",
+    "source": "No styling source found. Project is a Python CLI tool with no CSS, design tokens, or styling framework.",
+    "extractedAt": "2026-06-20T00:00:00Z"
+  },
+  "colors": {},
+  "typography": {},
+  "spacing": {},
+  "breakpoints": {},
+  "shadows": {},
+  "borders": {},
+  "zIndex": {}
+}

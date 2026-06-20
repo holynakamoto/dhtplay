@@ -147,9 +147,9 @@ def main(argv=None):
     ap.add_argument(
         "--port", "-p",
         type=int,
-        default=8000,
+        default=8888,
         metavar="PORT",
-        help="HTTP streaming server port (default: 8000)",
+        help="HTTP streaming server port (default: 8888)",
     )
 
     args = ap.parse_args(argv)

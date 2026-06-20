@@ -1,11 +1,11 @@
 {
   "id": "task-shortening-url-output-to-http-lanip-8888-01kvkmaap8ys",
-  "status": "active",
+  "status": "completed",
   "stage": "release",
   "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T23:02:10Z",
-  "updatedAt": "2026-06-20T23:09:31Z",
+  "updatedAt": "2026-06-20T23:10:27Z",
   "events": [
     {
       "base_branch": "main",
@@ -370,6 +370,50 @@
       "stage": "release",
       "timestamp": "2026-06-20T23:09:31Z",
       "type": "work_resumed"
+    },
+    {
+      "change_summary": "Release validated — build passes, code pushed",
+      "revision": 1,
+      "stage": "release",
+      "timestamp": "2026-06-20T23:10:02Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Release complete — task done",
+      "rationale": "Production build passes, review approved on 2026-06-20T23:08:47Z, code committed (8880725) and pushed to origin",
+      "timestamp": "2026-06-20T23:10:04Z",
+      "type": "decision"
+    },
+    {
+      "stage": "release",
+      "summary": "Release complete. Production build passes, review approved (3/3 AC, 39/39 tests), commit 8880725 pushed to origin. Default port changed from 8000 to 8888 across dhtplay and test_dhtplay.py.",
+      "timestamp": "2026-06-20T23:10:07Z",
+      "type": "stage_work_complete",
+      "worktree_head": "88807251d4bdba2ba62c5c58fd02b21f665cbd3f",
+      "worktree_status_digest": "53a0d8d0ae35b48750cab27bfcc4342542a401fcdb1d066a63bc96583683d58c"
+    },
+    {
+      "base_branch": "main",
+      "files_changed": 3,
+      "lines_added": 3,
+      "lines_removed": 3,
+      "timestamp": "2026-06-20T23:10:26Z",
+      "type": "worktree_merged"
+    },
+    {
+      "timestamp": "2026-06-20T23:10:26Z",
+      "type": "worktree_removed"
+    },
+    {
+      "branch": "feature/task-shortening-url-output-to-http-lanip-8888-01kvkmaap8ys",
+      "timestamp": "2026-06-20T23:10:27Z",
+      "type": "remote_branch_deleted"
+    },
+    {
+      "actor": null,
+      "timestamp": "2026-06-20T23:10:27Z",
+      "type": "task_completed"
     }
   ],
   "needsArchitecture": false,
@@ -388,42 +432,42 @@
   },
   "stageApprovals": {
     "review": "2026-06-20T23:08:47Z",
-    "implementation": "2026-06-20T23:07:26Z",
-    "scope": "2026-06-20T23:06:19Z"
+    "scope": "2026-06-20T23:06:19Z",
+    "implementation": "2026-06-20T23:07:26Z"
   },
+  "completedAt": "2026-06-20T23:10:27Z",
   "stageContent": {
     "implementation": "## Phase 1: Change default port to 8888\n\n### Changes Made\n\n**`dhtplay` (lines 150, 152):**\n- `default=8000` → `default=8888`\n- help string `(default: 8000)` → `(default: 8888)`\n\n**`test_dhtplay.py` (line 406):**\n- `self.assertIn(\"8000\", output)` → `self.assertIn(\"8888\", output)`\n\n### Test Results\n\n39/39 tests pass. No deviations from the plan.",
-    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll three acceptance criteria pass. The port default was changed from 8000 to 8888 in both the argparse definition and help string, the S13 test assertion was updated to match, and the full 39-test suite passes with zero failures.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite | PASS | 39/39 pass — python3 test_dhtplay.py ALL PASS |\n\n### Acceptance Criteria (3/3 passed)\n\n- [x] AC-1: `./dhtplay <infohash> --url` (no explicit `--port`) launches webtorrent with `-p 8888` and prints `http://<ip>:8888/0` — PASS: dhtplay:150 default=8888; dhtplay:185 wt_cmd_http uses str(args.port); dhtplay:186 prints f'http://{lan_ip}:{args.port}/0'; S13 test_url_flag_prints_http_url asserts '8888' at test_dhtplay.py:406 and passes\n- [x] AC-2: `./dhtplay <infohash> --url --port 9999` still launches webtorrent with `-p 9999` and prints port 9999 — PASS: argparse parses --port into args.port; dhtplay:185-186 use args.port for both Popen args and printed URL; S15 test_port_value_in_popen_args confirms --port 9999 reaches Popen args (test passes)\n- [x] AC-3: `python3 test_dhtplay.py` passes all scenarios with zero failures — PASS: python3 test_dhtplay.py output: Ran 39 tests in 0.057s OK — ALL PASS\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Keep /0 path segment in the printed URL; change only the port default from 8000 to 8888 — removing /0 would cause webtorrent to serve an HTML directory listing rather than the video stream\n\n## Required Changes\n\nNone.\n"
+    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll three acceptance criteria pass. The port default was changed from 8000 to 8888 in both the argparse definition and help string, the S13 test assertion was updated to match, and the full 39-test suite passes with zero failures.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite | PASS | 39/39 pass — python3 test_dhtplay.py ALL PASS |\n\n### Acceptance Criteria (3/3 passed)\n\n- [x] AC-1: `./dhtplay <infohash> --url` (no explicit `--port`) launches webtorrent with `-p 8888` and prints `http://<ip>:8888/0` — PASS: dhtplay:150 default=8888; dhtplay:185 wt_cmd_http uses str(args.port); dhtplay:186 prints f'http://{lan_ip}:{args.port}/0'; S13 test_url_flag_prints_http_url asserts '8888' at test_dhtplay.py:406 and passes\n- [x] AC-2: `./dhtplay <infohash> --url --port 9999` still launches webtorrent with `-p 9999` and prints port 9999 — PASS: argparse parses --port into args.port; dhtplay:185-186 use args.port for both Popen args and printed URL; S15 test_port_value_in_popen_args confirms --port 9999 reaches Popen args (test passes)\n- [x] AC-3: `python3 test_dhtplay.py` passes all scenarios with zero failures — PASS: python3 test_dhtplay.py output: Ran 39 tests in 0.057s OK — ALL PASS\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Keep /0 path segment in the printed URL; change only the port default from 8000 to 8888 — removing /0 would cause webtorrent to serve an HTML directory listing rather than the video stream\n\n## Required Changes\n\nNone.\n",
+    "release": "## Release Notes\n\n### What was built\n- Changed the `--port` argument default from 8000 to 8888 in the `dhtplay` CLI tool\n- Updated the argparse help string to read `(default: 8888)` to match the new default\n- Updated the S13 test assertion in `test_dhtplay.py` to check for `\"8888\"` instead of `\"8000\"`\n- Preserved the `/0` path segment in the printed URL to maintain streaming correctness\n- Explicit `--port` overrides continue to work correctly at user-specified ports\n\n### Key decisions\n- Keep `/0` path segment in the printed URL; change only the port default from 8000 to 8888 — removing `/0` would cause webtorrent to serve an HTML directory listing rather than the video stream\n\n### Changes by phase\n- **Phase 1: Change default port to 8888** — Updated `--port` argparse default from 8000 to 8888 in `dhtplay` (lines 150, 152) and updated S13 test assertion in `test_dhtplay.py` (line 406). All 39 tests pass.\n\n## Verification\n\n### Production Build\nPASS — Python syntax check and module load passed (no compilation step; single-script project).\n\n### Release Checklist\n- [x] Approved review exists — reviewed and approved at 2026-06-20T23:08:47Z (3/3 AC passed, 39/39 tests passed)\n- [x] Production build passes — `python3 -m py_compile dhtplay` and module load both PASS\n- [x] Code committed and pushed — commit `8880725` pushed to `origin/feature/task-shortening-url-output-to-http-lanip-8888-01kvkmaap8ys`\n- [x] Release notes prepared\n- [x] Stage content updated\n- [x] Completion event logged\n"
   },
   "stages": {
-    "scope": {
-      "status": "approved",
-      "approvedAt": "2026-06-20T23:06:19Z",
-      "startedAt": "2026-06-20T23:03:25Z"
-    },
     "design": {
       "status": "skipped"
+    },
+    "architecture": {
+      "status": "skipped"
+    },
+    "release": {
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-20T23:08:47Z"
     },
     "implementation": {
       "status": "approved",
       "approvedAt": "2026-06-20T23:07:26Z",
       "startedAt": "2026-06-20T23:06:20Z"
     },
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T23:06:19Z",
+      "startedAt": "2026-06-20T23:03:25Z"
+    },
     "review": {
       "status": "approved",
       "approvedAt": "2026-06-20T23:08:47Z",
       "startedAt": "2026-06-20T23:07:26Z"
-    },
-    "architecture": {
-      "status": "skipped"
-    },
-    "release": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T23:08:47Z"
     }
   },
-  "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-shortening-url-output-to-http-lanip-8888-01kvkmaap8ys",
-  "worktreeBaseBranch": "main",
   "worktreeLastSyncedAt": "2026-06-20T23:08:47Z",
   "reviewPayload": {
     "verdict": "approve",

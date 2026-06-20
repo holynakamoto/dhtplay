@@ -14,7 +14,6 @@ defract:
   assignee: holynakamoto
 ---
 
-
 ## Story Brief
 
 # Shortening --url output to http://{LANIP}:8888
@@ -148,4 +147,34 @@ No security issues found in changed files.
 ## Required Changes
 
 None.
+
+## Release
+
+## Release Notes
+
+### What was built
+- Changed the `--port` argument default from 8000 to 8888 in the `dhtplay` CLI tool
+- Updated the argparse help string to read `(default: 8888)` to match the new default
+- Updated the S13 test assertion in `test_dhtplay.py` to check for `"8888"` instead of `"8000"`
+- Preserved the `/0` path segment in the printed URL to maintain streaming correctness
+- Explicit `--port` overrides continue to work correctly at user-specified ports
+
+### Key decisions
+- Keep `/0` path segment in the printed URL; change only the port default from 8000 to 8888 — removing `/0` would cause webtorrent to serve an HTML directory listing rather than the video stream
+
+### Changes by phase
+- **Phase 1: Change default port to 8888** — Updated `--port` argparse default from 8000 to 8888 in `dhtplay` (lines 150, 152) and updated S13 test assertion in `test_dhtplay.py` (line 406). All 39 tests pass.
+
+## Verification
+
+### Production Build
+PASS — Python syntax check and module load passed (no compilation step; single-script project).
+
+### Release Checklist
+- [x] Approved review exists — reviewed and approved at 2026-06-20T23:08:47Z (3/3 AC passed, 39/39 tests passed)
+- [x] Production build passes — `python3 -m py_compile dhtplay` and module load both PASS
+- [x] Code committed and pushed — commit `8880725` pushed to `origin/feature/task-shortening-url-output-to-http-lanip-8888-01kvkmaap8ys`
+- [x] Release notes prepared
+- [x] Stage content updated
+- [x] Completion event logged
 

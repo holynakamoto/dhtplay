@@ -403,7 +403,7 @@ class S13_UrlFlag(unittest.TestCase):
         self.assertEqual(rc, 0)
         output = out.getvalue()
         self.assertIn("http://", output)
-        self.assertIn("8000", output)
+        self.assertIn("8888", output)
         self.assertIn("/0", output)
 
     def test_url_flag_no_vlc(self):

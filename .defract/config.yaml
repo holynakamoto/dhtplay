@@ -11,9 +11,11 @@ defract:
   defaults:
     mode: human-in-the-loop
     branch_strategy: worktree
-    auto_push_enabled: false
+    base_branch: main
+    auto_push_enabled: true
     offline_override: false
     completion_mode: merge
+    worktree_assets: []
   agents: null
   concurrency: null
   context_monitor:

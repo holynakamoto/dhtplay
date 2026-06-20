@@ -6,8 +6,8 @@ This project uses [defract](https://defract.dev) for structured AI-assisted deve
 
 | Task | Stage | Status |
 |------|-------|--------|
-| Shortening --url output to http://{LANIP}:8888 | scope | active |
 | Building dhtplay capability test matrix | release | completed |
+| Shortening --url output to http://{LANIP}:8888 | release | completed |
 | Stream to mobile VLC via URL, no local VLC | release | completed |
 
 

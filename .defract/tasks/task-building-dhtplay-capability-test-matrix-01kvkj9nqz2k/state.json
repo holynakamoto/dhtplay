@@ -1,11 +1,11 @@
 {
   "id": "task-building-dhtplay-capability-test-matrix-01kvkj9nqz2k",
   "status": "active",
-  "stage": "scope",
+  "stage": "implementation",
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-20T22:26:51Z",
-  "updatedAt": "2026-06-20T22:27:50Z",
+  "updatedAt": "2026-06-20T22:34:58Z",
   "events": [
     {
       "base_branch": "main",
@@ -54,30 +54,216 @@
       "timed_out": false,
       "timestamp": "2026-06-20T22:27:50Z",
       "type": "agent_exited"
+    },
+    {
+      "change_summary": "Full scope: 7 requirements, 9 acceptance criteria, 1 phase — bug fixes + S13–S16 test scenarios",
+      "revision": 2,
+      "timestamp": "2026-06-20T22:30:51Z",
+      "type": "scope_update"
+    },
+    {
+      "rationale": "Bug fixes + test expansion touching only 2 files (dhtplay and test_dhtplay.py), no UI changes (skip design), well-contained to a single subsystem (skip architecture)",
+      "stages": [
+        "scope",
+        "implementation",
+        "review",
+        "release"
+      ],
+      "template": "bug-fix",
+      "tier": "standard",
+      "timestamp": "2026-06-20T22:30:56Z",
+      "type": "workflow_classified"
+    },
+    {
+      "alternatives_considered": [
+        "Skip S10 entirely and remove the scenario",
+        "Mark S10 as a skipTest when webtorrent is absent using unittest.skipUnless"
+      ],
+      "decision": "S10 is refactored to test find_webtorrent() resolution logic via mocks, not assert webtorrent-cli is installed",
+      "rationale": "The existing S10 tests are environment-coupled: they call find_webtorrent() against the real filesystem and assert a non-None result, which fails on machines without webtorrent-cli. The fix patches dhtplay._executable and dhtplay.subprocess.run to verify that hardcoded candidates are preferred over `which` fallback — preserving coverage of the logic without requiring the tool to be installed.",
+      "timestamp": "2026-06-20T22:31:04Z",
+      "type": "decision"
+    },
+    {
+      "alternatives_considered": [
+        "Add a deprecation comment and leave it in place",
+        "Wire _find_stream_url into the --url branch so it is no longer dead (out of scope for this task)"
+      ],
+      "decision": "_find_stream_url is deleted rather than kept as unused code or marked deprecated",
+      "rationale": "The function is unreachable — main() never calls it, no test references it, and its docstring describes a URL-scanning behavior that the --url branch explicitly does not implement (--url prints the root URL without capturing stdout). Dead code adds maintenance surface with no return. Deletion is safe and permanent.",
+      "timestamp": "2026-06-20T22:31:08Z",
+      "type": "decision"
+    },
+    {
+      "stage": "scope",
+      "summary": "Full scope written as revision 2. 7 requirements across two groups (3 bug fixes, 4 new test scenarios), 9 acceptance criteria, 1 implementation phase touching dhtplay and test_dhtplay.py. Workflow classified as bug-fix/standard: scope → implementation → review → release.",
+      "timestamp": "2026-06-20T22:31:14Z",
+      "type": "stage_work_complete",
+      "worktree_head": "d92f3830e99c097039d12d818ebd55b4c1337616",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T22:31:29Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "scope",
+      "timestamp": "2026-06-20T22:31:29Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "258c54a33d017b257e8abe2bf9d688eff5b5d63c",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "scope",
+      "stale_worktree_head": "d92f3830e99c097039d12d818ebd55b4c1337616",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T22:31:29Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "scope",
+      "timestamp": "2026-06-20T22:31:29Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "scope",
+      "timestamp": "2026-06-20T22:31:29Z",
+      "to": "implementation",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T22:31:29Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvkjj5f7gk3qayyrdgsttnpz",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:31:30Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvkjbeqk63h9zwex5mn0z97a",
+      "timed_out": false,
+      "timestamp": "2026-06-20T22:31:30Z",
+      "type": "agent_exited"
+    },
+    {
+      "note": "Starting phase 1: fix get_lan_ip NameError, remove dead _find_stream_url, refactor S10, add S13-S16",
+      "phase": 0,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:33:28Z",
+      "type": "work_resumed"
+    },
+    {
+      "description": "Starting phase 1: Fix defects and add missing test coverage",
+      "percentage": 0,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:33:31Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running verification checks",
+      "percentage": 60,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:34:22Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running full check suite",
+      "percentage": 80,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:34:36Z",
+      "type": "progress_report"
+    },
+    {
+      "details": "38/38 tests pass across 16 scenario classes (S01-S16). All new and refactored tests pass with no real subprocess, network, or filesystem calls.",
+      "failed": 0,
+      "passed": 38,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-20T22:34:39Z",
+      "type": "test_results"
+    },
+    {
+      "description": "Phase 1 implementation complete — awaiting approval",
+      "percentage": 100,
+      "phase": 1,
+      "timestamp": "2026-06-20T22:34:42Z",
+      "type": "progress_report"
+    },
+    {
+      "change_summary": "Phase 1 complete: Fix defects and add missing test coverage",
+      "revision": 1,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T22:34:55Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "artifacts_created": [
+        "dhtplay",
+        "test_dhtplay.py"
+      ],
+      "phase": 0,
+      "summary": "Fixed get_lan_ip() NameError, removed dead _find_stream_url, refactored S10 to use mocks, added S13/S14/S15/S16. All 38 tests pass across 16 scenario classes.",
+      "timestamp": "2026-06-20T22:34:58Z",
+      "type": "phase_completed"
     }
   ],
+  "needsArchitecture": false,
+  "needsDesign": false,
+  "workflow": {
+    "tier": "standard",
+    "template": "bug-fix",
+    "stages": [
+      "scope",
+      "implementation",
+      "review",
+      "release"
+    ],
+    "classifiedBy": "scope-agent",
+    "rationale": "Bug fixes + test expansion touching only 2 files (dhtplay and test_dhtplay.py), no UI changes (skip design), well-contained to a single subsystem (skip architecture)"
+  },
+  "stageApprovals": {
+    "scope": "2026-06-20T22:31:29Z"
+  },
+  "stageContent": {
+    "implementation": "## Phase 1: Fix defects and add missing test coverage\n\n### Files changed\n\n**`dhtplay`**\n- Fixed `get_lan_ip()` NameError: initialized `s = None` before the try block; guarded `finally` with `if s is not None: s.close()`. The happy path (ipconfig or socket succeeds) is unchanged.\n- Removed `_find_stream_url` (was lines 111–137) entirely — no callers existed.\n- Removed `import threading` (was only used by `_find_stream_url`).\n\n**`test_dhtplay.py`**\n- Refactored S10: replaced environment-coupled live `find_webtorrent()` calls with two mock-based tests verifying the resolution logic (hardcoded candidates preferred over `which` fallback).\n- Added S13 (`--url` flag): asserts stdout contains `http://` and `8000` (default port), exit code 0. Mocks Popen, find_webtorrent, get_lan_ip.\n- Added S14 (`--url` keyboard interrupt): asserts `proc.terminate()` called exactly once after `KeyboardInterrupt` from `proc.wait()`, exit code 0.\n- Added S15 (`--port` flag): asserts both `-p` and `\"9999\"` appear in the Popen call args list.\n- Added S16 (`get_lan_ip()` unit tests): three sub-tests covering ipconfig success, socket fallback, and OSError fallback to `\"127.0.0.1\"` — the last specifically exercises the formerly-buggy code path.\n\n### Test results\n38/38 tests pass across 16 scenario classes (S01–S16). No real subprocess, network, or filesystem calls are made by any test."
+  },
   "stages": {
-    "architecture": {
+    "review": {
       "status": "not_started"
     },
     "implementation": {
-      "status": "not_started"
-    },
-    "scope": {
       "status": "in_progress",
-      "startedAt": "2026-06-20T22:27:50Z"
+      "startedAt": "2026-06-20T22:31:30Z"
     },
     "design": {
-      "status": "not_started"
+      "status": "skipped"
+    },
+    "architecture": {
+      "status": "skipped"
+    },
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T22:31:29Z",
+      "startedAt": "2026-06-20T22:27:50Z"
     },
     "release": {
-      "status": "not_started"
-    },
-    "review": {
       "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-building-dhtplay-capability-test-matrix-01kvkj9nqz2k",
   "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-20T22:27:50Z"
+  "worktreeLastSyncedAt": "2026-06-20T22:31:29Z"
 }

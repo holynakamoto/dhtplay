@@ -1,11 +1,11 @@
 {
   "id": "task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
   "status": "active",
-  "stage": "scope",
+  "stage": "implementation",
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-20T23:17:27Z",
-  "updatedAt": "2026-06-20T23:21:36Z",
+  "updatedAt": "2026-06-20T23:23:53Z",
   "events": [
     {
       "base_branch": "main",
@@ -95,6 +95,76 @@
       "type": "stage_work_complete",
       "worktree_head": "7bc9ab9c36b7d563717407dc41751ba1cac491b0",
       "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T23:23:33Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "scope",
+      "timestamp": "2026-06-20T23:23:32Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "cc36dffac2c7fe07cca92d41c461eaf3c9944891",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "scope",
+      "stale_worktree_head": "7bc9ab9c36b7d563717407dc41751ba1cac491b0",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T23:23:33Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "scope",
+      "timestamp": "2026-06-20T23:23:33Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "scope",
+      "timestamp": "2026-06-20T23:23:33Z",
+      "to": "implementation",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T23:23:33Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvknhfxxn6nkayr8phfqqtxq",
+      "stage": "implementation",
+      "timestamp": "2026-06-20T23:23:33Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvkn7f21m9ta18045xy7xtgn",
+      "timed_out": false,
+      "timestamp": "2026-06-20T23:23:33Z",
+      "type": "agent_exited"
+    },
+    {
+      "note": "Starting Phase 1: Fix URL output and add QR code",
+      "phase": 0,
+      "stage": "implementation",
+      "timestamp": "2026-06-20T23:23:50Z",
+      "type": "work_resumed"
+    },
+    {
+      "description": "Starting phase 1: Fix URL output and add QR code",
+      "percentage": 0,
+      "phase": 1,
+      "timestamp": "2026-06-20T23:23:53Z",
+      "type": "progress_report"
     }
   ],
   "needsArchitecture": false,
@@ -111,28 +181,33 @@
     "classifiedBy": "scope-agent",
     "rationale": "Primary objective is fixing broken behavior (hardcoded /0 path is dead). QR code is a small additive enhancement on the same code path. No UI changes (CLI tool, skip design). Work is contained to 2 files, single function rewrite — no new system boundaries (skip architecture)."
   },
+  "stageApprovals": {
+    "scope": "2026-06-20T23:23:32Z"
+  },
   "stages": {
     "scope": {
-      "status": "awaiting_approval",
+      "status": "approved",
+      "approvedAt": "2026-06-20T23:23:32Z",
       "startedAt": "2026-06-20T23:18:05Z"
-    },
-    "review": {
-      "status": "not_started"
-    },
-    "architecture": {
-      "status": "skipped"
-    },
-    "release": {
-      "status": "not_started"
     },
     "design": {
       "status": "skipped"
     },
+    "architecture": {
+      "status": "skipped"
+    },
     "implementation": {
+      "status": "in_progress",
+      "startedAt": "2026-06-20T23:23:33Z"
+    },
+    "review": {
+      "status": "not_started"
+    },
+    "release": {
       "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
   "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-20T23:18:05Z"
+  "worktreeLastSyncedAt": "2026-06-20T23:23:33Z"
 }

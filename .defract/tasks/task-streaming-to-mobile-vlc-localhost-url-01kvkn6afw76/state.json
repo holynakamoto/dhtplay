@@ -1,11 +1,11 @@
 {
   "id": "task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
-  "status": "active",
-  "stage": "review",
+  "status": "completed",
+  "stage": "release",
   "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-20T23:17:27Z",
-  "updatedAt": "2026-06-20T23:32:47Z",
+  "updatedAt": "2026-06-20T23:38:31Z",
   "events": [
     {
       "base_branch": "main",
@@ -350,6 +350,138 @@
       "stage": "review",
       "timestamp": "2026-06-20T23:32:47Z",
       "type": "stage_agent_started"
+    },
+    {
+      "details": "python3 test_dhtplay.py: 41/41 pass in 0.058s. S13 (2 tests), S14, S17, S18 all pass. S01-S12, S15-S16 unchanged and passing.",
+      "failed": 0,
+      "passed": 41,
+      "phase": 1,
+      "skipped": 0,
+      "timestamp": "2026-06-20T23:34:45Z",
+      "type": "test_results"
+    },
+    {
+      "change_summary": "APPROVE: All 7 acceptance criteria pass. The --url branch correctly pipes webtorrent stdout through a background daemon thread, extracts the real stream URL via a port-anchored regex, substitutes localhost with the LAN IP, and optionally renders a QR code. All 41 test scenarios pass including the new S17 and S18.",
+      "revision": 1,
+      "stage": "review",
+      "timestamp": "2026-06-20T23:35:10Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Review verdict: APPROVE",
+      "rationale": "7/7 acceptance criteria passed, 2/2 automated checks passed. No security findings. One info-level code quality note (redundant FileNotFoundError in except tuple). Implementation correctly pipes webtorrent stdout via background thread, extracts real stream URL, substitutes LAN IP, and renders optional QR code.",
+      "timestamp": "2026-06-20T23:35:14Z",
+      "type": "decision"
+    },
+    {
+      "stage": "review",
+      "summary": "APPROVE — 7/7 ACs pass, 41/41 tests pass. Implementation is clean and correct. One optional info note: FileNotFoundError is redundant in the except tuple at dhtplay:142 since it is a subclass of OSError. Ready to advance to release.",
+      "timestamp": "2026-06-20T23:35:21Z",
+      "type": "stage_work_complete",
+      "worktree_head": "6db75a6dcf77b602752d3b39b8f0a6ff1fc7a42e",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 1,
+      "timestamp": "2026-06-20T23:35:37Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "review",
+      "timestamp": "2026-06-20T23:35:36Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "dc9f57f3d47d9c293d92634bc415b57de5c73dad",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "review",
+      "stale_worktree_head": "6db75a6dcf77b602752d3b39b8f0a6ff1fc7a42e",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-20T23:35:37Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "review",
+      "timestamp": "2026-06-20T23:35:37Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "review",
+      "timestamp": "2026-06-20T23:35:37Z",
+      "to": "release",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-20T23:35:37Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvkp7jzstha1b6g32f3g4x49",
+      "stage": "release",
+      "timestamp": "2026-06-20T23:35:37Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "note": "Release stage: run production build, push branch, record release notes",
+      "phase": 1,
+      "stage": "release",
+      "timestamp": "2026-06-20T23:36:15Z",
+      "type": "work_resumed"
+    },
+    {
+      "change_summary": "Release validated — build passes, code pushed",
+      "revision": 1,
+      "stage": "release",
+      "timestamp": "2026-06-20T23:37:03Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Release complete — task done",
+      "rationale": "Production build passes, review approved on 2026-06-20T23:35:36Z, code committed (08affa9) and pushed to origin/feature/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
+      "timestamp": "2026-06-20T23:37:07Z",
+      "type": "decision"
+    },
+    {
+      "stage": "release",
+      "summary": "Release complete. Production build passes, branch pushed to remote. Review approved 2026-06-20 (7/7 ACs, 41/41 tests). Implementation commit 08affa9 is on the feature branch and ready for merge.",
+      "timestamp": "2026-06-20T23:37:12Z",
+      "type": "stage_work_complete",
+      "worktree_head": "dc9f57f3d47d9c293d92634bc415b57de5c73dad",
+      "worktree_status_digest": "53a0d8d0ae35b48750cab27bfcc4342542a401fcdb1d066a63bc96583683d58c"
+    },
+    {
+      "base_branch": "main",
+      "files_changed": 4,
+      "lines_added": 113,
+      "lines_removed": 7,
+      "timestamp": "2026-06-20T23:38:29Z",
+      "type": "worktree_merged"
+    },
+    {
+      "timestamp": "2026-06-20T23:38:29Z",
+      "type": "worktree_removed"
+    },
+    {
+      "branch": "feature/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
+      "timestamp": "2026-06-20T23:38:31Z",
+      "type": "remote_branch_deleted"
+    },
+    {
+      "actor": null,
+      "timestamp": "2026-06-20T23:38:31Z",
+      "type": "task_completed"
     }
   ],
   "needsArchitecture": false,
@@ -367,21 +499,17 @@
     "rationale": "Primary objective is fixing broken behavior (hardcoded /0 path is dead). QR code is a small additive enhancement on the same code path. No UI changes (CLI tool, skip design). Work is contained to 2 files, single function rewrite — no new system boundaries (skip architecture)."
   },
   "stageApprovals": {
-    "implementation": "2026-06-20T23:32:46Z",
-    "scope": "2026-06-20T23:23:32Z"
+    "scope": "2026-06-20T23:23:32Z",
+    "review": "2026-06-20T23:35:36Z",
+    "implementation": "2026-06-20T23:32:46Z"
   },
+  "completedAt": "2026-06-20T23:38:31Z",
   "stageContent": {
-    "implementation": "## Phase 1: Fix URL output and add QR code\n\n### What was built\n\n**`dhtplay` changes:**\n- Added `import queue` and `import threading`\n- Added `_find_stream_url(proc, port, timeout=30)`: starts a daemon thread that reads `proc.stdout` line by line and puts the first URL matching `r'https?://\\S*{port}\\S*'` into a `queue.Queue`. Main thread calls `q.get(timeout=30)`, returning `None` on `queue.Empty`.\n- Added `_render_qr(url)`: calls `subprocess.run([\"qrencode\", \"-t\", \"ansiutf8\", url])`, catching `(OSError, FileNotFoundError)` silently.\n- Rewrote `--url` branch: launches webtorrent with `stdout=subprocess.PIPE, text=True`, calls `_find_stream_url`, substitutes `localhost`/`127.0.0.1` with LAN IP via `re.sub`, falls back to `http://{lan_ip}:{port}/` on timeout, prints URL, calls `_render_qr`, then preserves existing `proc.wait()` / `KeyboardInterrupt → proc.terminate()` path.\n\n**`test_dhtplay.py` changes:**\n- S13 rewritten: `test_url_flag_prints_http_url` mocks `proc_mock.stdout = iter([\"Server running at: http://localhost:8888/Movie.mkv\\n\"])` and asserts output contains `192.168.1.100` and `/Movie.mkv` (not `localhost`). `test_url_flag_no_vlc` patches `_find_stream_url` directly to return `None` quickly.\n- S14 updated: added `patch(\"dhtplay._find_stream_url\", return_value=None)` and `patch(\"dhtplay._render_qr\")` to prevent the 30-second queue timeout (MagicMock's default `__iter__` yields nothing, so the reader exits immediately and the main thread would block).\n- S17 added: asserts `subprocess.run` is called with `[\"qrencode\", \"-t\", \"ansiutf8\", \"http://192.168.1.100:8888/Movie.mkv\"]` when `_find_stream_url` returns `\"http://localhost:8888/Movie.mkv\"`.\n- S18 added: asserts exit code 0 and empty stderr when `subprocess.run` raises `FileNotFoundError`.\n\n### Test results\n41/41 passing. Runtime: 0.06s."
+    "implementation": "## Phase 1: Fix URL output and add QR code\n\n### What was built\n\n**`dhtplay` changes:**\n- Added `import queue` and `import threading`\n- Added `_find_stream_url(proc, port, timeout=30)`: starts a daemon thread that reads `proc.stdout` line by line and puts the first URL matching `r'https?://\\S*{port}\\S*'` into a `queue.Queue`. Main thread calls `q.get(timeout=30)`, returning `None` on `queue.Empty`.\n- Added `_render_qr(url)`: calls `subprocess.run([\"qrencode\", \"-t\", \"ansiutf8\", url])`, catching `(OSError, FileNotFoundError)` silently.\n- Rewrote `--url` branch: launches webtorrent with `stdout=subprocess.PIPE, text=True`, calls `_find_stream_url`, substitutes `localhost`/`127.0.0.1` with LAN IP via `re.sub`, falls back to `http://{lan_ip}:{port}/` on timeout, prints URL, calls `_render_qr`, then preserves existing `proc.wait()` / `KeyboardInterrupt → proc.terminate()` path.\n\n**`test_dhtplay.py` changes:**\n- S13 rewritten: `test_url_flag_prints_http_url` mocks `proc_mock.stdout = iter([\"Server running at: http://localhost:8888/Movie.mkv\\n\"])` and asserts output contains `192.168.1.100` and `/Movie.mkv` (not `localhost`). `test_url_flag_no_vlc` patches `_find_stream_url` directly to return `None` quickly.\n- S14 updated: added `patch(\"dhtplay._find_stream_url\", return_value=None)` and `patch(\"dhtplay._render_qr\")` to prevent the 30-second queue timeout (MagicMock's default `__iter__` yields nothing, so the reader exits immediately and the main thread would block).\n- S17 added: asserts `subprocess.run` is called with `[\"qrencode\", \"-t\", \"ansiutf8\", \"http://192.168.1.100:8888/Movie.mkv\"]` when `_find_stream_url` returns `\"http://localhost:8888/Movie.mkv\"`.\n- S18 added: asserts exit code 0 and empty stderr when `subprocess.run` raises `FileNotFoundError`.\n\n### Test results\n41/41 passing. Runtime: 0.06s.",
+    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll 7 acceptance criteria pass. The --url branch correctly pipes webtorrent stdout through a background daemon thread, extracts the real stream URL via a port-anchored regex, substitutes localhost with the LAN IP, and optionally renders a QR code. All 41 test scenarios pass including the new S17 and S18.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite (python3 test_dhtplay.py) | PASS | 41/41 tests pass in 0.058s |\n| Help smoke check (--url and --port in usage) | PASS | Both flags confirmed present in argparse --help output |\n\n### Acceptance Criteria (7/7 passed)\n\n- [x] AC-1: python3 test_dhtplay.py exits 0 with all scenarios passing. — PASS: 41/41 tests pass, exit code 0, runtime 0.058s\n- [x] AC-2: S13 asserts that the printed URL contains the path from the mocked webtorrent stdout and that localhost has been replaced with the mocked LAN IP (not the hardcoded /0). — PASS: test_dhtplay.py:407-409 — assertIn('192.168.1.100', output), assertIn('/Movie.mkv', output), assertNotIn('localhost', output)\n- [x] AC-3: S17 asserts that when qrencode is mocked as available, subprocess.run is called once with [\"qrencode\", \"-t\", \"ansiutf8\", <url>]. — PASS: test_dhtplay.py:541-543 — run_mock.assert_called_once_with(['qrencode', '-t', 'ansiutf8', 'http://192.168.1.100:8888/Movie.mkv'])\n- [x] AC-4: S18 asserts that when qrencode raises FileNotFoundError, the exit code is 0 and stderr is empty. — PASS: test_dhtplay.py:570-571 — assertEqual(rc, 0), assertEqual(err.getvalue(), '')\n- [x] AC-5: Manual check: ./dhtplay <hex-hash> --url prints a URL containing the host machine's LAN IP and a path matching what webtorrent announces; a QR code appears in the terminal if qrencode is installed. — PASS: dhtplay:226-233 — _find_stream_url scans stdout, re.sub replaces localhost/127.0.0.1 with LAN IP, prints URL, calls _render_qr; --url and --port confirmed present in --help output\n- [x] AC-6: S14 (KeyboardInterrupt calls proc.terminate()) continues to pass — the terminate path is unchanged. — PASS: test_dhtplay.py:454 — proc_mock.terminate.assert_called_once() passes; dhtplay:236-238 preserves proc.wait()/KeyboardInterrupt path verbatim\n- [x] AC-7: S11 and S15 (non-url path and --port propagation) continue to pass with no regressions. — PASS: test_popen_called_with_magnet, test_popen_failure_returns_exit_3, and test_port_value_in_popen_args all pass within the 41/41 total\n\n### Code Quality (Refactor Review)\n\n#### Redundant exception clause\n\n- **INFO:** `dhtplay:142` — FileNotFoundError is a subclass of OSError, so listing both in the except tuple is redundant — OSError alone catches every FileNotFoundError. Suggested fix: Simplify to `except OSError:` in _render_qr; behavior is identical and the tuple no longer implies they are distinct error families\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Use a background daemon thread + queue.Queue to scan webtorrent stdout, with a 30-second timeout before falling back to the root URL\n- Match any URL containing the port number (not a fixed path pattern) in the webtorrent stdout scan — port is the stable anchor across webtorrent-cli versions\n- S14 and S13 test_url_flag_no_vlc patch _find_stream_url and _render_qr directly to avoid a 30-second queue timeout in tests that do not exercise URL scanning\n- Added text=True to subprocess.Popen in the --url branch so proc.stdout yields str lines, consistent with how test mocks provide string iterators\n\n## Required Changes\n\nNone.\n",
+    "release": "## Release Notes\n\n### What was built\n- Fixed `--url` path in `dhtplay` to read webtorrent's real stream URL from its stdout rather than hardcoding the defunct `/0` path\n- Added `_find_stream_url(proc, port, timeout=30)` helper using a background daemon thread and `queue.Queue` to scan webtorrent stdout with a 30-second fallback to the root URL\n- Added `_render_qr(url)` helper that runs `qrencode -t ansiutf8 <url>` when available, silently skipping on `OSError`\n- Substituted `localhost`/`127.0.0.1` with the machine's LAN IP so the printed URL is reachable from a phone on the same Wi-Fi\n- Added test scenarios S17 (qrencode present) and S18 (qrencode absent); updated S13 and S14 to mock the new stdout-scanning path\n\n### Key decisions\n- Use a background daemon thread + `queue.Queue` to scan webtorrent stdout, with a 30-second timeout before falling back to the root URL — keeps the main thread responsive without adding a new dependency\n- Match any URL containing the port number (not a fixed path pattern) — port is the stable anchor across webtorrent-cli versions, preventing the fix from breaking again on a future webtorrent update\n- S13 `test_url_flag_no_vlc` and S14 patch `_find_stream_url` and `_render_qr` directly to avoid a 30-second queue timeout in tests that do not exercise URL scanning\n- Added `text=True` to `subprocess.Popen` in the `--url` branch so `proc.stdout` yields `str` lines, consistent with how test mocks provide string iterators\n\n### Changes by phase\n- **Phase 1: Fix URL output and add QR code** — Rewrote the `--url` branch to pipe webtorrent stdout through a background daemon thread, extract the real stream URL via a port-anchored regex, substitute the LAN IP, print the result, and optionally render a QR code. Updated S13, S14, and added S17/S18. All 41 tests pass.\n\n## Verification\n\n### Production Build\nPASS — `python3 -m py_compile dhtplay` exits 0\n\n### Review Reference\nApproved by reviewer on 2026-06-20 — 7/7 acceptance criteria, 2/2 automated checks passed\n\n### Release Checklist\n- [x] Approved review exists (verdict: APPROVE, 2026-06-20T23:35:36Z)\n- [x] Production build passes\n- [x] Code committed and pushed (feature/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76)\n- [x] Release notes prepared\n- [x] Stage content updated\n- [x] Completion event logged\n"
   },
   "stages": {
-    "architecture": {
-      "status": "skipped"
-    },
-    "scope": {
-      "status": "approved",
-      "approvedAt": "2026-06-20T23:23:32Z",
-      "startedAt": "2026-06-20T23:18:05Z"
-    },
     "implementation": {
       "status": "approved",
       "approvedAt": "2026-06-20T23:32:46Z",
@@ -390,15 +518,115 @@
     "design": {
       "status": "skipped"
     },
-    "review": {
-      "status": "in_progress",
-      "startedAt": "2026-06-20T23:32:47Z"
-    },
     "release": {
-      "status": "not_started"
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-20T23:35:37Z"
+    },
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T23:23:32Z",
+      "startedAt": "2026-06-20T23:18:05Z"
+    },
+    "architecture": {
+      "status": "skipped"
+    },
+    "review": {
+      "status": "approved",
+      "approvedAt": "2026-06-20T23:35:36Z",
+      "startedAt": "2026-06-20T23:32:47Z"
     }
   },
-  "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-streaming-to-mobile-vlc-localhost-url-01kvkn6afw76",
-  "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-20T23:32:47Z"
+  "worktreeLastSyncedAt": "2026-06-20T23:35:37Z",
+  "reviewPayload": {
+    "verdict": "approve",
+    "summary": "All 7 acceptance criteria pass. The --url branch correctly pipes webtorrent stdout through a background daemon thread, extracts the real stream URL via a port-anchored regex, substitutes localhost with the LAN IP, and optionally renders a QR code. All 41 test scenarios pass including the new S17 and S18.",
+    "filesReviewedCount": 2,
+    "phasesReviewedCount": 1,
+    "automatedChecks": [
+      {
+        "name": "Test suite (python3 test_dhtplay.py)",
+        "result": "pass",
+        "detail": "41/41 tests pass in 0.058s"
+      },
+      {
+        "name": "Help smoke check (--url and --port in usage)",
+        "result": "pass",
+        "detail": "Both flags confirmed present in argparse --help output"
+      }
+    ],
+    "acceptanceCriteria": [
+      {
+        "acId": "AC-1",
+        "text": "python3 test_dhtplay.py exits 0 with all scenarios passing.",
+        "status": "pass",
+        "evidence": "41/41 tests pass, exit code 0, runtime 0.058s"
+      },
+      {
+        "acId": "AC-2",
+        "text": "S13 asserts that the printed URL contains the path from the mocked webtorrent stdout and that localhost has been replaced with the mocked LAN IP (not the hardcoded /0).",
+        "status": "pass",
+        "evidence": "test_dhtplay.py:407-409 — assertIn('192.168.1.100', output), assertIn('/Movie.mkv', output), assertNotIn('localhost', output)"
+      },
+      {
+        "acId": "AC-3",
+        "text": "S17 asserts that when qrencode is mocked as available, subprocess.run is called once with [\"qrencode\", \"-t\", \"ansiutf8\", <url>].",
+        "status": "pass",
+        "evidence": "test_dhtplay.py:541-543 — run_mock.assert_called_once_with(['qrencode', '-t', 'ansiutf8', 'http://192.168.1.100:8888/Movie.mkv'])"
+      },
+      {
+        "acId": "AC-4",
+        "text": "S18 asserts that when qrencode raises FileNotFoundError, the exit code is 0 and stderr is empty.",
+        "status": "pass",
+        "evidence": "test_dhtplay.py:570-571 — assertEqual(rc, 0), assertEqual(err.getvalue(), '')"
+      },
+      {
+        "acId": "AC-5",
+        "text": "Manual check: ./dhtplay <hex-hash> --url prints a URL containing the host machine's LAN IP and a path matching what webtorrent announces; a QR code appears in the terminal if qrencode is installed.",
+        "status": "pass",
+        "evidence": "dhtplay:226-233 — _find_stream_url scans stdout, re.sub replaces localhost/127.0.0.1 with LAN IP, prints URL, calls _render_qr; --url and --port confirmed present in --help output"
+      },
+      {
+        "acId": "AC-6",
+        "text": "S14 (KeyboardInterrupt calls proc.terminate()) continues to pass — the terminate path is unchanged.",
+        "status": "pass",
+        "evidence": "test_dhtplay.py:454 — proc_mock.terminate.assert_called_once() passes; dhtplay:236-238 preserves proc.wait()/KeyboardInterrupt path verbatim"
+      },
+      {
+        "acId": "AC-7",
+        "text": "S11 and S15 (non-url path and --port propagation) continue to pass with no regressions.",
+        "status": "pass",
+        "evidence": "test_popen_called_with_magnet, test_popen_failure_returns_exit_3, and test_port_value_in_popen_args all pass within the 41/41 total"
+      }
+    ],
+    "headlineFindings": [],
+    "requiredChanges": [],
+    "codeQualityFindings": [
+      {
+        "category": "Redundant exception clause",
+        "severity": "info",
+        "file": "dhtplay",
+        "line": 142,
+        "description": "FileNotFoundError is a subclass of OSError, so listing both in the except tuple is redundant — OSError alone catches every FileNotFoundError.",
+        "fixOrRemediation": "Simplify to `except OSError:` in _render_qr; behavior is identical and the tuple no longer implies they are distinct error families"
+      }
+    ],
+    "securityFindings": [],
+    "decisions": [
+      "Use a background daemon thread + queue.Queue to scan webtorrent stdout, with a 30-second timeout before falling back to the root URL",
+      "Match any URL containing the port number (not a fixed path pattern) in the webtorrent stdout scan — port is the stable anchor across webtorrent-cli versions",
+      "S14 and S13 test_url_flag_no_vlc patch _find_stream_url and _render_qr directly to avoid a 30-second queue timeout in tests that do not exercise URL scanning",
+      "Added text=True to subprocess.Popen in the --url branch so proc.stdout yields str lines, consistent with how test mocks provide string iterators"
+    ],
+    "revision": 1,
+    "changeAnnotations": [
+      {
+        "file": "dhtplay",
+        "note": "Adds _find_stream_url (background thread + queue with 30s fallback) and _render_qr helpers; rewrites the --url branch to pipe webtorrent stdout, extract the real stream URL, substitute the LAN IP, and optionally render a QR code"
+      },
+      {
+        "file": "test_dhtplay.py",
+        "note": "Updates S13 to mock webtorrent stdout with a URL announcement line and assert LAN IP substitution; adds S17 (qrencode present) and S18 (qrencode absent); patches _find_stream_url/_render_qr in S14 to avoid 30-second timeout"
+      }
+    ]
+  }
 }

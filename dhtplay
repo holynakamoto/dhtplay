@@ -3,10 +3,12 @@
 
 import argparse
 import base64
+import queue
 import re
 import socket
 import subprocess
 import sys
+import threading
 from urllib.parse import quote
 
 TRACKERS = [
@@ -109,6 +111,38 @@ def get_lan_ip():
             s.close()
 
 
+def _find_stream_url(proc, port, timeout=30):
+    """Scan proc.stdout for the first URL containing port; return it or None on timeout."""
+    q = queue.Queue()
+    pattern = re.compile(r'https?://\S*' + re.escape(str(port)) + r'\S*')
+
+    def _reader():
+        try:
+            matched = False
+            for line in proc.stdout:
+                if not matched:
+                    m = pattern.search(line)
+                    if m:
+                        q.put(m.group(0))
+                        matched = True
+        except Exception:
+            pass
+
+    threading.Thread(target=_reader, daemon=True).start()
+    try:
+        return q.get(timeout=timeout)
+    except queue.Empty:
+        return None
+
+
+def _render_qr(url):
+    """Render a QR code for url via qrencode; skip silently if qrencode is absent."""
+    try:
+        subprocess.run(["qrencode", "-t", "ansiutf8", url])
+    except (OSError, FileNotFoundError):
+        pass
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(
         prog="dhtplay",
@@ -183,12 +217,20 @@ def main(argv=None):
     if args.url:
         lan_ip = get_lan_ip()
         wt_cmd_http = [wt, magnet, "-p", str(args.port)]
-        print(f"▶  http://{lan_ip}:{args.port}/0")
         try:
-            proc = subprocess.Popen(wt_cmd_http)
+            proc = subprocess.Popen(wt_cmd_http, stdout=subprocess.PIPE, text=True)
         except OSError as exc:
             print(f"dhtplay: failed to launch webtorrent: {exc}", file=sys.stderr)
             return 3
+
+        url = _find_stream_url(proc, args.port)
+        if url is not None:
+            url = re.sub(r'localhost|127\.0\.0\.1', lan_ip, url)
+        else:
+            url = f"http://{lan_ip}:{args.port}/"
+
+        print(f"▶  {url}")
+        _render_qr(url)
 
         try:
             proc.wait()

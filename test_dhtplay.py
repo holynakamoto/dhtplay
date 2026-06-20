@@ -380,10 +380,10 @@ class S12_CLIEndToEnd(unittest.TestCase):
 
 
 # ===========================================================================
-# S13 — --url flag prints a http:// URL containing the port number
+# S13 — --url flag reads real stream URL from webtorrent stdout, substitutes LAN IP
 # ===========================================================================
 class S13_UrlFlag(unittest.TestCase):
-    """CRITERIA: --url prints http://<ip>:<port>/0 to stdout, no --vlc in Popen args, exit code 0."""
+    """CRITERIA: --url pipes webtorrent stdout, finds real URL, substitutes LAN IP, exit 0."""
 
     IH = "aabbccddee" * 4
     WT = "/opt/homebrew/bin/webtorrent"
@@ -392,19 +392,21 @@ class S13_UrlFlag(unittest.TestCase):
         import io
         from contextlib import redirect_stdout
         proc_mock = MagicMock()
+        proc_mock.stdout = iter(["Server running at: http://localhost:8888/Movie.mkv\n"])
         proc_mock.wait.return_value = None
         popen_mock = MagicMock(return_value=proc_mock)
         out = io.StringIO()
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
         self.assertEqual(rc, 0)
         output = out.getvalue()
-        self.assertIn("http://", output)
-        self.assertIn("8888", output)
-        self.assertIn("/0", output)
+        self.assertIn("192.168.1.100", output)
+        self.assertIn("/Movie.mkv", output)
+        self.assertNotIn("localhost", output)
 
     def test_url_flag_no_vlc(self):
         import io
@@ -416,6 +418,8 @@ class S13_UrlFlag(unittest.TestCase):
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("dhtplay._find_stream_url", return_value=None), \
+             patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
         self.assertEqual(rc, 0)
@@ -442,6 +446,8 @@ class S14_UrlKeyboardInterrupt(unittest.TestCase):
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="127.0.0.1"), \
+             patch("dhtplay._find_stream_url", return_value=None), \
+             patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
         self.assertEqual(rc, 0)
@@ -505,6 +511,64 @@ class S16_GetLanIp(unittest.TestCase):
              patch("socket.socket", side_effect=OSError("no socket")):
             ip = dhtplay.get_lan_ip()
         self.assertEqual(ip, "127.0.0.1")
+
+
+# ===========================================================================
+# S17 — qrencode present: subprocess.run called with qrencode args
+# ===========================================================================
+class S17_QrCode(unittest.TestCase):
+    """CRITERIA: when qrencode is available, subprocess.run is called with the right args."""
+
+    IH = "aabbccddee" * 4
+    WT = "/opt/homebrew/bin/webtorrent"
+
+    def test_qrencode_called_with_url(self):
+        import io
+        from contextlib import redirect_stdout
+        proc_mock = MagicMock()
+        proc_mock.wait.return_value = None
+        popen_mock = MagicMock(return_value=proc_mock)
+        run_mock = MagicMock()
+        out = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", popen_mock), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("dhtplay._find_stream_url", return_value="http://localhost:8888/Movie.mkv"), \
+             patch("dhtplay.subprocess.run", run_mock), \
+             redirect_stdout(out):
+            rc = main([self.IH, "--url"])
+        self.assertEqual(rc, 0)
+        run_mock.assert_called_once_with(
+            ["qrencode", "-t", "ansiutf8", "http://192.168.1.100:8888/Movie.mkv"]
+        )
+
+
+# ===========================================================================
+# S18 — qrencode absent: FileNotFoundError swallowed, exit 0, stderr empty
+# ===========================================================================
+class S18_QrCodeAbsent(unittest.TestCase):
+    """CRITERIA: when qrencode raises FileNotFoundError, exit code is 0 and stderr is empty."""
+
+    IH = "aabbccddee" * 4
+    WT = "/opt/homebrew/bin/webtorrent"
+
+    def test_qrencode_absent_no_error(self):
+        import io
+        from contextlib import redirect_stdout, redirect_stderr
+        proc_mock = MagicMock()
+        proc_mock.wait.return_value = None
+        popen_mock = MagicMock(return_value=proc_mock)
+        out = io.StringIO()
+        err = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", popen_mock), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("dhtplay._find_stream_url", return_value=None), \
+             patch("dhtplay.subprocess.run", side_effect=FileNotFoundError("qrencode not found")), \
+             redirect_stdout(out), redirect_stderr(err):
+            rc = main([self.IH, "--url"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(err.getvalue(), "")
 
 
 # ---------------------------------------------------------------------------

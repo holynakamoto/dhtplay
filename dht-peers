@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+// DHT peer lookup — prints peers found for an infohash within a timeout
+import DHT from '/Users/nickmoore/.local/lib/node_modules/webtorrent-cli/node_modules/bittorrent-dht/index.js'
+
+const raw = process.argv[2]
+if (!raw) {
+  console.error('Usage: dht-peers <infohash-hex>')
+  process.exit(1)
+}
+
+const ih = Buffer.from(raw.replace(/^urn:btih:/i, '').trim().toLowerCase(), 'hex')
+if (ih.length !== 20) {
+  console.error('Error: infohash must be 40 hex characters (20 bytes)')
+  process.exit(1)
+}
+
+const TIMEOUT_MS = 30_000
+const dht = new DHT()
+const seen = new Set()
+
+dht.on('peer', (peer) => {
+  const addr = `${peer.host}:${peer.port}`
+  if (!seen.has(addr)) {
+    seen.add(addr)
+    console.log(addr)
+  }
+})
+
+dht.listen(0, () => {
+  dht.lookup(ih)
+})
+
+const timer = setTimeout(() => {
+  process.stderr.write(`\n${seen.size} peer(s) found in ${TIMEOUT_MS / 1000}s\n`)
+  dht.destroy()
+  process.exit(seen.size > 0 ? 0 : 1)
+}, TIMEOUT_MS)
+
+// Exit early if DHT is destroyed elsewhere
+dht.on('close', () => clearTimeout(timer))

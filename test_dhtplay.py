@@ -383,16 +383,15 @@ class S12_CLIEndToEnd(unittest.TestCase):
 # S13 — --url flag reads real stream URL from webtorrent stdout, substitutes LAN IP
 # ===========================================================================
 class S13_UrlFlag(unittest.TestCase):
-    """CRITERIA: --url pipes webtorrent stdout, finds real URL, substitutes LAN IP, exit 0."""
+    """CRITERIA: --url constructs URL from known webtorrent path pattern, no stdout piping, exit 0."""
 
     IH = "aabbccddee" * 4
     WT = "/opt/homebrew/bin/webtorrent"
 
-    def test_url_flag_prints_http_url(self):
+    def test_url_flag_prints_http_url_with_infohash(self):
         import io
         from contextlib import redirect_stdout
         proc_mock = MagicMock()
-        proc_mock.stdout = iter(["Server running at: http://localhost:8888/Movie.mkv\n"])
         proc_mock.wait.return_value = None
         popen_mock = MagicMock(return_value=proc_mock)
         out = io.StringIO()
@@ -405,7 +404,7 @@ class S13_UrlFlag(unittest.TestCase):
         self.assertEqual(rc, 0)
         output = out.getvalue()
         self.assertIn("192.168.1.100", output)
-        self.assertIn("/Movie.mkv", output)
+        self.assertIn(self.IH, output)
         self.assertNotIn("localhost", output)
 
     def test_url_flag_no_vlc(self):
@@ -418,13 +417,31 @@ class S13_UrlFlag(unittest.TestCase):
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
-             patch("dhtplay._find_stream_url", return_value=None), \
              patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
         self.assertEqual(rc, 0)
         call_args = popen_mock.call_args[0][0]
         self.assertNotIn("--vlc", call_args)
+
+    def test_url_flag_popen_not_piped(self):
+        # stdout must NOT be piped — piping suppresses webtorrent's TUI and causes early exit
+        import io
+        from contextlib import redirect_stdout
+        captured_kwargs = {}
+        proc_mock = MagicMock()
+        proc_mock.wait.return_value = None
+        def capturing_popen(cmd, **kwargs):
+            captured_kwargs.update(kwargs)
+            return proc_mock
+        out = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", capturing_popen), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("dhtplay._render_qr"), \
+             redirect_stdout(out):
+            main([self.IH, "--url"])
+        self.assertNotIn("stdout", captured_kwargs)
 
 
 # ===========================================================================
@@ -446,7 +463,6 @@ class S14_UrlKeyboardInterrupt(unittest.TestCase):
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="127.0.0.1"), \
-             patch("dhtplay._find_stream_url", return_value=None), \
              patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
@@ -533,13 +549,13 @@ class S17_QrCode(unittest.TestCase):
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
-             patch("dhtplay._find_stream_url", return_value="http://localhost:8888/Movie.mkv"), \
              patch("dhtplay.subprocess.run", run_mock), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
         self.assertEqual(rc, 0)
+        expected_url = f"http://192.168.1.100:8888/webtorrent/{self.IH}/"
         run_mock.assert_called_once_with(
-            ["qrencode", "-t", "ansiutf8", "http://192.168.1.100:8888/Movie.mkv"]
+            ["qrencode", "-t", "ansiutf8", expected_url]
         )
 
 
@@ -563,7 +579,6 @@ class S18_QrCodeAbsent(unittest.TestCase):
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
-             patch("dhtplay._find_stream_url", return_value=None), \
              patch("dhtplay.subprocess.run", side_effect=FileNotFoundError("qrencode not found")), \
              redirect_stdout(out), redirect_stderr(err):
             rc = main([self.IH, "--url"])

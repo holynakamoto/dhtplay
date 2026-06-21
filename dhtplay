@@ -3,6 +3,7 @@
 
 import argparse
 import base64
+import os
 import queue
 import re
 import socket
@@ -13,14 +14,16 @@ from urllib.parse import quote
 
 TRACKERS = [
     "udp://tracker.opentrackr.org:1337/announce",
-    "udp://open.tracker.cl:1337/announce",
-    "udp://tracker.openbittorrent.com:6969/announce",
+    "udp://open.demonii.com:1337",
+    "udp://tracker.openbittorrent.com:80/announce",
     "udp://tracker.torrent.eu.org:451/announce",
+    "wss://tracker.btorrent.xyz",
 ]
 
 WEBTORRENT_CANDIDATES = [
     "/opt/homebrew/bin/webtorrent",
     "/usr/local/bin/webtorrent",
+    os.path.expanduser("~/.local/bin/webtorrent"),
 ]
 
 
@@ -80,7 +83,6 @@ def find_webtorrent(override=None):
 
 
 def _executable(path):
-    import os
     return os.path.isfile(path) and os.access(path, os.X_OK)
 
 
@@ -216,21 +218,22 @@ def main(argv=None):
 
     if args.url:
         lan_ip = get_lan_ip()
-        wt_cmd_http = [wt, magnet, "-p", str(args.port)]
+        # Webtorrent serves at a predictable path — construct it directly rather
+        # than parsing stdout, which suppresses the TUI and causes early exit.
+        url = f"http://{lan_ip}:{args.port}/webtorrent/{ih_hex}/"
+        print(f"▶  {url}")
+        _render_qr(url)
+
+        # /bin/true acts as a no-op player so webtorrent fully resolves
+        # torrent metadata and initialises the HTTP server, then exits
+        # immediately; --no-quit keeps webtorrent alive after it does.
+        wt_cmd_http = [wt, magnet, "-p", str(args.port),
+                       "--player", "/bin/true", "--no-quit", "--keep-seeding"]
         try:
-            proc = subprocess.Popen(wt_cmd_http, stdout=subprocess.PIPE, text=True)
+            proc = subprocess.Popen(wt_cmd_http)
         except OSError as exc:
             print(f"dhtplay: failed to launch webtorrent: {exc}", file=sys.stderr)
             return 3
-
-        url = _find_stream_url(proc, args.port)
-        if url is not None:
-            url = re.sub(r'localhost|127\.0\.0\.1', lan_ip, url)
-        else:
-            url = f"http://{lan_ip}:{args.port}/"
-
-        print(f"▶  {url}")
-        _render_qr(url)
 
         try:
             proc.wait()

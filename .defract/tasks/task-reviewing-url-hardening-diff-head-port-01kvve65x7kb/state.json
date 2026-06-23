@@ -1,0 +1,83 @@
+{
+  "id": "task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
+  "status": "active",
+  "stage": "scope",
+  "phase": 0,
+  "totalPhases": 1,
+  "createdAt": "2026-06-23T23:48:58Z",
+  "updatedAt": "2026-06-23T23:49:44Z",
+  "events": [
+    {
+      "base_branch": "main",
+      "branch": "feature/task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
+      "path": "/Users/nickmoore/dhtplay/.defract-worktrees/task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
+      "timestamp": "2026-06-23T23:48:58Z",
+      "type": "worktree_created"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvve65rbaydapy8mv3snrgeb",
+      "stage": "scope",
+      "timestamp": "2026-06-23T23:48:58Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "change_summary": "Intent check: simplify --url output, drop redirect server, add reachability probe",
+      "revision": 1,
+      "timestamp": "2026-06-23T23:49:33Z",
+      "type": "scope_update"
+    },
+    {
+      "stage": "scope",
+      "summary": "Intent check pushed: remove the redirect server from --url, QR-encode the direct long file URL, add a LAN reachability probe, update tests accordingly.",
+      "timestamp": "2026-06-23T23:49:37Z",
+      "type": "stage_work_complete",
+      "worktree_head": "d0245d36e43f6fb345db81e0ba375fadf2c4c19d",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-23T23:49:44Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "approve_initial",
+      "session_id": "01kvve7jp67ga9rdzrdpkfe495",
+      "stage": "scope",
+      "timestamp": "2026-06-23T23:49:44Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvve65rbaydapy8mv3snrgeb",
+      "timed_out": false,
+      "timestamp": "2026-06-23T23:49:44Z",
+      "type": "agent_exited"
+    }
+  ],
+  "stages": {
+    "design": {
+      "status": "not_started"
+    },
+    "review": {
+      "status": "not_started"
+    },
+    "release": {
+      "status": "not_started"
+    },
+    "implementation": {
+      "status": "not_started"
+    },
+    "scope": {
+      "status": "in_progress",
+      "startedAt": "2026-06-23T23:49:44Z"
+    },
+    "architecture": {
+      "status": "not_started"
+    }
+  },
+  "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
+  "worktreeBaseBranch": "main",
+  "worktreeLastSyncedAt": "2026-06-23T23:49:44Z"
+}

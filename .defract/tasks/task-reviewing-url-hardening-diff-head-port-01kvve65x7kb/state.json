@@ -1,11 +1,11 @@
 {
   "id": "task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
   "status": "active",
-  "stage": "scope",
+  "stage": "implementation",
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-23T23:48:58Z",
-  "updatedAt": "2026-06-23T23:49:44Z",
+  "updatedAt": "2026-06-23T23:54:46Z",
   "events": [
     {
       "base_branch": "main",
@@ -54,30 +54,146 @@
       "timed_out": false,
       "timestamp": "2026-06-23T23:49:44Z",
       "type": "agent_exited"
+    },
+    {
+      "change_summary": "Full scope: requirements, acceptance criteria, single implementation phase with files and verification",
+      "revision": 2,
+      "timestamp": "2026-06-23T23:54:03Z",
+      "type": "scope_update"
+    },
+    {
+      "rationale": "Bug-fix template: the --url path has broken behavior (redirect server causes playback failures, tests S13–S18 partially fail against current code). No UI changes (CLI tool only), so design is skipped. Changes are confined to 2 files and build on existing patterns, so architecture is skipped. Tier standard: bounded refactor of one function plus matching test updates.",
+      "stages": [
+        "scope",
+        "implementation",
+        "review",
+        "release"
+      ],
+      "template": "bug-fix",
+      "tier": "standard",
+      "timestamp": "2026-06-23T23:54:10Z",
+      "type": "workflow_classified"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Exit code 3 is reused for the reachability probe failure rather than introducing a new exit code 4.",
+      "rationale": "The project documents three exit codes (0, 2, 3). Code 3 already means \"webtorrent could not be used to stream\" — an unreachable server fits that meaning. Adding a fourth code increases the surface area for callers without enough benefit for a single-user CLI tool.",
+      "timestamp": "2026-06-23T23:54:16Z",
+      "type": "decision"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "URL discovery in the --url branch continues to use HTTP polling against localhost, not stdout scanning via _find_stream_url.",
+      "rationale": "Removing stdout=DEVNULL means webtorrent's TUI is visible, but the TUI output is not structured enough for reliable URL parsing (format varies across webtorrent-cli versions per existing project memory). The HTTP polling loop against localhost:port/webtorrent/{ih_hex}/ is version-stable and already implemented.",
+      "timestamp": "2026-06-23T23:54:22Z",
+      "type": "decision"
+    },
+    {
+      "stage": "scope",
+      "summary": "Full scope written as revision 2. 16 requirements across four areas (redirect server removal, direct URL output, LAN reachability probe, test updates), 5 acceptance criteria, single implementation phase touching dhtplay and test_dhtplay.py. Workflow classified as bug-fix/standard. Key finding from codebase exploration: S13–S18 tests partially fail against the current code (proc.poll mock returns non-None MagicMock, stdout=DEVNULL set against S13's assertion), so the implementation must add correct mocks alongside the behavioral changes.",
+      "timestamp": "2026-06-23T23:54:34Z",
+      "type": "stage_work_complete",
+      "worktree_head": "d0245d36e43f6fb345db81e0ba375fadf2c4c19d",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 1,
+      "timestamp": "2026-06-23T23:54:46Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "scope",
+      "timestamp": "2026-06-23T23:54:45Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "11f70460d21001d86a3e002c5e4f34d960f16d51",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "scope",
+      "stale_worktree_head": "d0245d36e43f6fb345db81e0ba375fadf2c4c19d",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-23T23:54:46Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "scope",
+      "timestamp": "2026-06-23T23:54:46Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "scope",
+      "timestamp": "2026-06-23T23:54:46Z",
+      "to": "implementation",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-23T23:54:46Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "session_id": "01kvvegspca1rs0s1m6ytsg5zw",
+      "stage": "implementation",
+      "timestamp": "2026-06-23T23:54:46Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "exit_code": 143,
+      "session_id": "01kvve7jp67ga9rdzrdpkfe495",
+      "timed_out": false,
+      "timestamp": "2026-06-23T23:54:46Z",
+      "type": "agent_exited"
     }
   ],
+  "needsArchitecture": false,
+  "needsDesign": false,
+  "workflow": {
+    "tier": "standard",
+    "template": "bug-fix",
+    "stages": [
+      "scope",
+      "implementation",
+      "review",
+      "release"
+    ],
+    "classifiedBy": "scope-agent",
+    "rationale": "Bug-fix template: the --url path has broken behavior (redirect server causes playback failures, tests S13–S18 partially fail against current code). No UI changes (CLI tool only), so design is skipped. Changes are confined to 2 files and build on existing patterns, so architecture is skipped. Tier standard: bounded refactor of one function plus matching test updates."
+  },
+  "stageApprovals": {
+    "scope": "2026-06-23T23:54:45Z"
+  },
   "stages": {
-    "design": {
-      "status": "not_started"
-    },
-    "review": {
-      "status": "not_started"
-    },
     "release": {
       "status": "not_started"
     },
-    "implementation": {
-      "status": "not_started"
-    },
-    "scope": {
-      "status": "in_progress",
-      "startedAt": "2026-06-23T23:49:44Z"
+    "design": {
+      "status": "skipped"
     },
     "architecture": {
+      "status": "skipped"
+    },
+    "implementation": {
+      "status": "in_progress",
+      "startedAt": "2026-06-23T23:54:46Z"
+    },
+    "scope": {
+      "status": "approved",
+      "approvedAt": "2026-06-23T23:54:45Z",
+      "startedAt": "2026-06-23T23:49:44Z"
+    },
+    "review": {
       "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
   "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-23T23:49:44Z"
+  "worktreeLastSyncedAt": "2026-06-23T23:54:46Z"
 }

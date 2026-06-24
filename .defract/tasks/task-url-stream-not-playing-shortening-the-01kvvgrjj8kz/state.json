@@ -5,7 +5,7 @@
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-24T00:33:58Z",
-  "updatedAt": "2026-06-24T15:19:17Z",
+  "updatedAt": "2026-06-24T15:22:00Z",
   "events": [
     {
       "base_branch": "main",
@@ -172,6 +172,105 @@
       "phase": 1,
       "timestamp": "2026-06-24T15:19:17Z",
       "type": "progress_report"
+    },
+    {
+      "description": "Running verification checks",
+      "percentage": 60,
+      "phase": 1,
+      "timestamp": "2026-06-24T15:20:54Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running full check suite",
+      "percentage": 80,
+      "phase": 1,
+      "timestamp": "2026-06-24T15:21:10Z",
+      "type": "progress_report"
+    },
+    {
+      "details": "44/44 passed. S13 gained one new test (test_url_flag_timeout_exits_nonzero_no_stdout); test_url_flag_popen_not_piped replaced by test_url_flag_no_quiet; test_url_flag_prints_http_url_with_infohash replaced by test_url_flag_prints_http_url_with_lan_ip. All S13-S19 urlopen mocks removed and proc_mock.stdout iterators added.",
+      "failed": 0,
+      "passed": 44,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-24T15:21:15Z",
+      "type": "test_results"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Implementation: patched _find_stream_url in timeout test rather than using iter([]) with the real function",
+      "phase": 1,
+      "rationale": "iter([]) with the real _find_stream_url would block for the full 30s timeout in tests. Per project memory: any test exercising a q.get(timeout=N) path must either provide real data or patch the function. The timeout test patches _find_stream_url to return None directly, keeping test runtime under 1s.",
+      "timestamp": "2026-06-24T15:21:21Z",
+      "type": "decision"
+    },
+    {
+      "description": "Phase 1 implementation complete — awaiting approval",
+      "percentage": 100,
+      "phase": 1,
+      "timestamp": "2026-06-24T15:21:24Z",
+      "type": "progress_report"
+    },
+    {
+      "change_summary": "Phase 1 complete: Replace HTTP polling with stdout URL scanning",
+      "revision": 1,
+      "stage": "implementation",
+      "timestamp": "2026-06-24T15:21:36Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "artifacts_created": [
+        "dhtplay",
+        "test_dhtplay.py"
+      ],
+      "phase": 0,
+      "summary": "Replaced 120-second urlopen polling loop with _find_stream_url stdout scanning. Removed --quiet and added stdout=PIPE+text=True to Popen. LAN IP substituted via re.sub. Tests S13-S19 rewritten to use proc_mock.stdout iterators; timeout test patches _find_stream_url to avoid 30s wait. 44/44 passing.",
+      "timestamp": "2026-06-24T15:21:46Z",
+      "type": "phase_completed"
+    },
+    {
+      "items": [
+        {
+          "description": "Run `python3 test_dhtplay.py` and confirm output ends with `44/44 passed  — ALL PASS`"
+        },
+        {
+          "description": "Run `grep -n 'urlopen' dhtplay` and confirm no output (the HTTP polling loop is fully removed)"
+        },
+        {
+          "description": "Run `grep -n '_find_stream_url' dhtplay` and confirm exactly two lines: the function definition and one call site inside the `if args.url:` block"
+        },
+        {
+          "description": "Run `grep -n '\\-\\-quiet' dhtplay` and confirm no output"
+        },
+        {
+          "description": "Run `./dhtplay <any-40-hex-infohash> --url --dry-run` — should print the magnet URI and exit 0 (dry-run bypasses the url branch entirely, verifying the non-url path is unaffected)"
+        },
+        {
+          "description": "With webtorrent-cli installed, run `./dhtplay <infohash> --url` and confirm: a URL containing your LAN IP is printed within ~30 seconds of webtorrent finding metadata, not after a 2-minute wait"
+        },
+        {
+          "description": "Confirm the printed URL does not contain `localhost` or `127.0.0.1` (unless no LAN IP is available)"
+        }
+      ],
+      "phase": 0,
+      "phase_title": "Replace HTTP polling with stdout URL scanning",
+      "timestamp": "2026-06-24T15:21:55Z",
+      "type": "manual_tests"
+    },
+    {
+      "agent_phase": 1,
+      "phase_title": "Replace HTTP polling with stdout URL scanning",
+      "server_phase": 0,
+      "timestamp": "2026-06-24T15:22:00Z",
+      "type": "phase_drift_detected"
+    },
+    {
+      "phase": 0,
+      "phase_title": "Replace HTTP polling with stdout URL scanning",
+      "timestamp": "2026-06-24T15:22:00Z",
+      "type": "phase_awaiting_approval",
+      "worktree_head": "af1450cc552251265bccc89bebbd52d056d3995a",
+      "worktree_status_digest": "ac15eab7c6c8449b5fde20254efc9dcf31d893e524a9e9d485b52f0f52c6d5fb"
     }
   ],
   "needsArchitecture": false,
@@ -191,22 +290,25 @@
   "stageApprovals": {
     "scope": "2026-06-24T15:14:15Z"
   },
+  "stageContent": {
+    "implementation": "## Phase 1: Replace HTTP polling with stdout URL scanning\n\n### Changes\n\n**`dhtplay`**\n- Removed unused imports: `import time`, `import urllib.request`, `import urllib.parse`\n- Rewrote `if args.url:` block: removed `import tempfile`, `--quiet`, `--out out_dir`, `--keep-seeding` stays, added `stdout=subprocess.PIPE, text=True` to Popen\n- Removed the 120-second `urlopen` polling loop entirely\n- Added `_find_stream_url(proc, args.port, timeout=30)` call; handles `None` return with stderr message and exit 3\n- Added `re.sub(r'https?://(?:localhost|127\\.0\\.0\\.1)', f'http://{lan_ip}', raw_url)` for LAN IP substitution\n\n**`test_dhtplay.py`**\n- S13: renamed `test_url_flag_prints_http_url_with_infohash` → `test_url_flag_prints_http_url_with_lan_ip`; removed urlopen mock; added `proc_mock.stdout = iter([...])`\n- S13: updated `test_url_flag_no_vlc` — same mock pattern change\n- S13: replaced `test_url_flag_popen_not_piped` with `test_url_flag_no_quiet` (verifies `--quiet` absent from Popen args)\n- S13: added `test_url_flag_timeout_exits_nonzero_no_stdout` (patches `_find_stream_url` to return `None`; verifies exit non-zero, stdout empty)\n- S14, S17, S18, S19: removed urlopen mocks; added `proc_mock.stdout = iter([\"http://localhost:8888/Movie.mkv\\n\"])`\n- S17: updated `expected_url` from infohash-based path to `http://192.168.1.100:8888/Movie.mkv`\n\n### Result\n44/44 tests passing (up from 43 — one new test added). All verification greps clean."
+  },
   "stages": {
     "design": {
       "status": "skipped"
     },
+    "review": {
+      "status": "not_started"
+    },
     "architecture": {
       "status": "skipped"
-    },
-    "release": {
-      "status": "not_started"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-24T15:14:15Z",
       "startedAt": "2026-06-24T00:36:21Z"
     },
-    "review": {
+    "release": {
       "status": "not_started"
     },
     "implementation": {

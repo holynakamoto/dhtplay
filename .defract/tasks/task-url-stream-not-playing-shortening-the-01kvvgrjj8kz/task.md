@@ -14,7 +14,6 @@ defract:
   assignee: holynakamoto
 ---
 
-
 ## Story Brief
 
 # Fix --url stream: resolve actual file URL from webtorrent stdout
@@ -124,3 +123,27 @@ proc_mock.stdout = iter(["http://localhost:8888/Movie.mkv\n"])
 ```
 
 This matches the `text=True` expectation in `_find_stream_url` (which iterates `proc.stdout` as strings).
+
+## Implementation Notes
+
+## Phase 1: Replace HTTP polling with stdout URL scanning
+
+### Changes
+
+**`dhtplay`**
+- Removed unused imports: `import time`, `import urllib.request`, `import urllib.parse`
+- Rewrote `if args.url:` block: removed `import tempfile`, `--quiet`, `--out out_dir`, `--keep-seeding` stays, added `stdout=subprocess.PIPE, text=True` to Popen
+- Removed the 120-second `urlopen` polling loop entirely
+- Added `_find_stream_url(proc, args.port, timeout=30)` call; handles `None` return with stderr message and exit 3
+- Added `re.sub(r'https?://(?:localhost|127\.0\.0\.1)', f'http://{lan_ip}', raw_url)` for LAN IP substitution
+
+**`test_dhtplay.py`**
+- S13: renamed `test_url_flag_prints_http_url_with_infohash` → `test_url_flag_prints_http_url_with_lan_ip`; removed urlopen mock; added `proc_mock.stdout = iter([...])`
+- S13: updated `test_url_flag_no_vlc` — same mock pattern change
+- S13: replaced `test_url_flag_popen_not_piped` with `test_url_flag_no_quiet` (verifies `--quiet` absent from Popen args)
+- S13: added `test_url_flag_timeout_exits_nonzero_no_stdout` (patches `_find_stream_url` to return `None`; verifies exit non-zero, stdout empty)
+- S14, S17, S18, S19: removed urlopen mocks; added `proc_mock.stdout = iter(["http://localhost:8888/Movie.mkv\n"])`
+- S17: updated `expected_url` from infohash-based path to `http://192.168.1.100:8888/Movie.mkv`
+
+### Result
+44/44 tests passing (up from 43 — one new test added). All verification greps clean.

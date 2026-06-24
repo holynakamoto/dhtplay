@@ -3,7 +3,7 @@ defract:
   id: task-url-stream-not-playing-shortening-the-01kvvgrjj8kz
   type: bug
   status: active
-  stage: scope
+  stage: implementation
   phase: 0
   total_phases: 1
   priority: normal
@@ -13,6 +13,7 @@ defract:
   created_by: holynakamoto
   assignee: holynakamoto
 ---
+
 
 ## Story Brief
 

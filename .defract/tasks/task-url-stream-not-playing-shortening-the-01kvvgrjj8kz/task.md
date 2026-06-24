@@ -3,7 +3,7 @@ defract:
   id: task-url-stream-not-playing-shortening-the-01kvvgrjj8kz
   type: bug
   status: active
-  stage: implementation
+  stage: review
   phase: 0
   total_phases: 1
   priority: normal
@@ -147,3 +147,47 @@ This matches the `text=True` expectation in `_find_stream_url` (which iterates `
 
 ### Result
 44/44 tests passing (up from 43 — one new test added). All verification greps clean.
+
+## Review
+
+## Verdict
+
+**Verdict:** APPROVE
+**Files reviewed:** 2 files changed across 1 phases
+
+All 7 acceptance criteria pass. The HTTP polling loop is fully removed, the --url branch correctly pipes webtorrent stdout and calls _find_stream_url, LAN IP substitution is applied, and the timeout path exits non-zero with no stdout output. 44/44 tests pass.
+
+### Automated Checks
+
+| Check | Result | Details |
+|-------|--------|---------|
+| Test suite | PASS | 44/44 passed — ALL PASS |
+
+### Acceptance Criteria (7/7 passed)
+
+- [x] AC-1: `dhtplay <infohash> --url` exits 0 and prints a line containing `http://<lan-ip>:8888/` when webtorrent announces a URL on stdout; verified by S13 passing — PASS: S13_UrlFlag.test_url_flag_prints_http_url_with_lan_ip passes. dhtplay:218-258: Popen launched with stdout=PIPE+text=True, _find_stream_url reads URL, re.sub replaces host, print outputs the URL, returns 0.
+- [x] AC-2: The printed URL contains the LAN IP from `get_lan_ip()`, not `localhost` or `127.0.0.1`; verified by `S13.test_url_flag_prints_http_url_with_lan_ip` — PASS: dhtplay:235: re.sub(r'https?://(?:localhost|127\.0\.0\.1)', f'http://{lan_ip}', raw_url). Test mocks get_lan_ip returning '192.168.1.100' and asserts '192.168.1.100' in output and 'localhost' not in output — passes.
+- [x] AC-3: When `proc.stdout` yields no URL-matching line, the command exits non-zero and stdout is empty; verified by the new timeout test (R8) — PASS: S13_UrlFlag.test_url_flag_timeout_exits_nonzero_no_stdout passes. dhtplay:228-233: when _find_stream_url returns None, prints error to stderr and returns 3. Test patches _find_stream_url to return None, asserts rc != 0 and out.getvalue() == ''.
+- [x] AC-4: The `--url` Popen call does not include `--quiet` in its argument list; verified by the replacement S13 test (R7) — PASS: S13_UrlFlag.test_url_flag_no_quiet passes. dhtplay:219: wt_cmd_http = [wt, magnet, '-p', str(args.port), '--keep-seeding'] — no --quiet present. Test captures all Popen cmd args and asserts '--quiet' not in captured_args.
+- [x] AC-5: `_find_stream_url` is called with the subprocess handle and `args.port`; no new URL-scanning logic is introduced; verified by reading `dhtplay` lines 221–270 after the change — PASS: dhtplay:227: raw_url = _find_stream_url(proc, args.port, timeout=30). grep shows exactly two lines: line 116 (definition) and line 227 (call site inside if args.url: block). No new URL-scanning logic introduced.
+- [x] AC-6: `grep -n "urlopen" dhtplay` returns no results — the HTTP polling loop is fully removed — PASS: grep -n 'urlopen' dhtplay returns exit code 1 with no output. The polling loop and urllib imports are fully removed.
+- [x] AC-7: `python3 test_dhtplay.py` exits 0 with all scenarios passing after the change — PASS: python3 test_dhtplay.py: 44/44 passed — ALL PASS. Exit code 0.
+
+### Code Quality (Refactor Review)
+
+No code quality issues found in changed files.
+
+### Security Assessment (Security Review)
+
+No security issues found in changed files.
+
+### Decisions Made During Implementation
+
+- Use existing _find_stream_url function unchanged — wire it in, don't rewrite it
+- Remove --quiet from the webtorrent command and pipe stdout so the URL announcement reaches _find_stream_url
+- Patch _find_stream_url in timeout test rather than using iter([]) with the real function to avoid blocking for the full 30s timeout
+
+## Required Changes
+
+None.
+

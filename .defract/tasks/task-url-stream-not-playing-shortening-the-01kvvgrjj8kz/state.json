@@ -1,11 +1,11 @@
 {
   "id": "task-url-stream-not-playing-shortening-the-01kvvgrjj8kz",
   "status": "active",
-  "stage": "implementation",
-  "phase": 0,
+  "stage": "review",
+  "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-24T00:33:58Z",
-  "updatedAt": "2026-06-24T15:22:00Z",
+  "updatedAt": "2026-06-24T15:39:13Z",
   "events": [
     {
       "base_branch": "main",
@@ -271,6 +271,108 @@
       "type": "phase_awaiting_approval",
       "worktree_head": "af1450cc552251265bccc89bebbd52d056d3995a",
       "worktree_status_digest": "ac15eab7c6c8449b5fde20254efc9dcf31d893e524a9e9d485b52f0f52c6d5fb"
+    },
+    {
+      "approved_by": "user",
+      "phase": 0,
+      "phase_title": "Replace HTTP polling with stdout URL scanning",
+      "timestamp": "2026-06-24T15:37:31Z",
+      "type": "phase_approved"
+    },
+    {
+      "checked_indices": [],
+      "phase": 0,
+      "timestamp": "2026-06-24T15:37:31Z",
+      "type": "manual_tests_checks_persisted"
+    },
+    {
+      "stage": "implementation",
+      "summary": "All phases approved — implementation ready for review.",
+      "timestamp": "2026-06-24T15:37:31Z",
+      "type": "stage_work_complete",
+      "worktree_head": "4362d04b868c10bfcbc5abcbbea9f826c437cb1f",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 2,
+      "timestamp": "2026-06-24T15:37:31Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "implementation",
+      "timestamp": "2026-06-24T15:37:31Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "1099a281047014a4d1ccde2fe25275e189c7e93a",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "implementation",
+      "stale_worktree_head": "4362d04b868c10bfcbc5abcbbea9f826c437cb1f",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-24T15:37:31Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "implementation",
+      "timestamp": "2026-06-24T15:37:31Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "implementation",
+      "timestamp": "2026-06-24T15:37:32Z",
+      "to": "review",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-24T15:37:32Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvx4f1ty1kzsg31e9hd2829x",
+      "stage": "review",
+      "timestamp": "2026-06-24T15:37:32Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "details": "python3 test_dhtplay.py: 44/44 passed, ALL PASS. S13 suite (4 tests) all pass: test_url_flag_prints_http_url_with_lan_ip, test_url_flag_no_vlc, test_url_flag_no_quiet, test_url_flag_timeout_exits_nonzero_no_stdout. S14-S19 all pass with updated proc_mock.stdout iterators.",
+      "failed": 0,
+      "passed": 44,
+      "phase": 1,
+      "skipped": 0,
+      "timestamp": "2026-06-24T15:38:35Z",
+      "type": "test_results"
+    },
+    {
+      "change_summary": "APPROVE: All 7 acceptance criteria pass. The HTTP polling loop is fully removed, the --url branch correctly pipes webtorrent stdout and calls _find_stream_url, LAN IP substitution is applied, and the timeout path exits non-zero with no stdout output. 44/44 tests pass.",
+      "revision": 1,
+      "stage": "review",
+      "timestamp": "2026-06-24T15:38:58Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Review verdict: APPROVE",
+      "rationale": "7/7 acceptance criteria passed, 1/1 automated checks passed (44/44 tests). No security issues, no code quality violations, no convention violations. The implementation correctly wires _find_stream_url into the --url branch, removes the 120-second polling loop, and handles the timeout/error path cleanly.",
+      "timestamp": "2026-06-24T15:39:02Z",
+      "type": "decision"
+    },
+    {
+      "stage": "review",
+      "summary": "APPROVE. All 7 ACs pass, 44/44 tests pass, no security or quality issues. The --url branch correctly reads the streaming URL from webtorrent stdout via _find_stream_url, applies LAN IP substitution, and handles the timeout path with a non-zero exit and no stdout output.",
+      "timestamp": "2026-06-24T15:39:13Z",
+      "type": "stage_work_complete",
+      "worktree_head": "1099a281047014a4d1ccde2fe25275e189c7e93a",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
   "needsArchitecture": false,
@@ -288,35 +390,116 @@
     "rationale": "Bug fix: restores broken --url behavior by wiring an existing function into the launch path. No UI changes (skip design). Well-contained to 2 files using an already-written helper (skip architecture)."
   },
   "stageApprovals": {
+    "implementation": "2026-06-24T15:37:31Z",
     "scope": "2026-06-24T15:14:15Z"
   },
   "stageContent": {
+    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll 7 acceptance criteria pass. The HTTP polling loop is fully removed, the --url branch correctly pipes webtorrent stdout and calls _find_stream_url, LAN IP substitution is applied, and the timeout path exits non-zero with no stdout output. 44/44 tests pass.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite | PASS | 44/44 passed — ALL PASS |\n\n### Acceptance Criteria (7/7 passed)\n\n- [x] AC-1: `dhtplay <infohash> --url` exits 0 and prints a line containing `http://<lan-ip>:8888/` when webtorrent announces a URL on stdout; verified by S13 passing — PASS: S13_UrlFlag.test_url_flag_prints_http_url_with_lan_ip passes. dhtplay:218-258: Popen launched with stdout=PIPE+text=True, _find_stream_url reads URL, re.sub replaces host, print outputs the URL, returns 0.\n- [x] AC-2: The printed URL contains the LAN IP from `get_lan_ip()`, not `localhost` or `127.0.0.1`; verified by `S13.test_url_flag_prints_http_url_with_lan_ip` — PASS: dhtplay:235: re.sub(r'https?://(?:localhost|127\\.0\\.0\\.1)', f'http://{lan_ip}', raw_url). Test mocks get_lan_ip returning '192.168.1.100' and asserts '192.168.1.100' in output and 'localhost' not in output — passes.\n- [x] AC-3: When `proc.stdout` yields no URL-matching line, the command exits non-zero and stdout is empty; verified by the new timeout test (R8) — PASS: S13_UrlFlag.test_url_flag_timeout_exits_nonzero_no_stdout passes. dhtplay:228-233: when _find_stream_url returns None, prints error to stderr and returns 3. Test patches _find_stream_url to return None, asserts rc != 0 and out.getvalue() == ''.\n- [x] AC-4: The `--url` Popen call does not include `--quiet` in its argument list; verified by the replacement S13 test (R7) — PASS: S13_UrlFlag.test_url_flag_no_quiet passes. dhtplay:219: wt_cmd_http = [wt, magnet, '-p', str(args.port), '--keep-seeding'] — no --quiet present. Test captures all Popen cmd args and asserts '--quiet' not in captured_args.\n- [x] AC-5: `_find_stream_url` is called with the subprocess handle and `args.port`; no new URL-scanning logic is introduced; verified by reading `dhtplay` lines 221–270 after the change — PASS: dhtplay:227: raw_url = _find_stream_url(proc, args.port, timeout=30). grep shows exactly two lines: line 116 (definition) and line 227 (call site inside if args.url: block). No new URL-scanning logic introduced.\n- [x] AC-6: `grep -n \"urlopen\" dhtplay` returns no results — the HTTP polling loop is fully removed — PASS: grep -n 'urlopen' dhtplay returns exit code 1 with no output. The polling loop and urllib imports are fully removed.\n- [x] AC-7: `python3 test_dhtplay.py` exits 0 with all scenarios passing after the change — PASS: python3 test_dhtplay.py: 44/44 passed — ALL PASS. Exit code 0.\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Use existing _find_stream_url function unchanged — wire it in, don't rewrite it\n- Remove --quiet from the webtorrent command and pipe stdout so the URL announcement reaches _find_stream_url\n- Patch _find_stream_url in timeout test rather than using iter([]) with the real function to avoid blocking for the full 30s timeout\n\n## Required Changes\n\nNone.\n",
     "implementation": "## Phase 1: Replace HTTP polling with stdout URL scanning\n\n### Changes\n\n**`dhtplay`**\n- Removed unused imports: `import time`, `import urllib.request`, `import urllib.parse`\n- Rewrote `if args.url:` block: removed `import tempfile`, `--quiet`, `--out out_dir`, `--keep-seeding` stays, added `stdout=subprocess.PIPE, text=True` to Popen\n- Removed the 120-second `urlopen` polling loop entirely\n- Added `_find_stream_url(proc, args.port, timeout=30)` call; handles `None` return with stderr message and exit 3\n- Added `re.sub(r'https?://(?:localhost|127\\.0\\.0\\.1)', f'http://{lan_ip}', raw_url)` for LAN IP substitution\n\n**`test_dhtplay.py`**\n- S13: renamed `test_url_flag_prints_http_url_with_infohash` → `test_url_flag_prints_http_url_with_lan_ip`; removed urlopen mock; added `proc_mock.stdout = iter([...])`\n- S13: updated `test_url_flag_no_vlc` — same mock pattern change\n- S13: replaced `test_url_flag_popen_not_piped` with `test_url_flag_no_quiet` (verifies `--quiet` absent from Popen args)\n- S13: added `test_url_flag_timeout_exits_nonzero_no_stdout` (patches `_find_stream_url` to return `None`; verifies exit non-zero, stdout empty)\n- S14, S17, S18, S19: removed urlopen mocks; added `proc_mock.stdout = iter([\"http://localhost:8888/Movie.mkv\\n\"])`\n- S17: updated `expected_url` from infohash-based path to `http://192.168.1.100:8888/Movie.mkv`\n\n### Result\n44/44 tests passing (up from 43 — one new test added). All verification greps clean."
   },
   "stages": {
+    "architecture": {
+      "status": "skipped"
+    },
+    "implementation": {
+      "status": "approved",
+      "approvedAt": "2026-06-24T15:37:31Z",
+      "startedAt": "2026-06-24T15:14:16Z"
+    },
+    "review": {
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-24T15:37:32Z"
+    },
     "design": {
       "status": "skipped"
     },
-    "review": {
+    "release": {
       "status": "not_started"
-    },
-    "architecture": {
-      "status": "skipped"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-24T15:14:15Z",
       "startedAt": "2026-06-24T00:36:21Z"
-    },
-    "release": {
-      "status": "not_started"
-    },
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-24T15:14:16Z"
     }
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-url-stream-not-playing-shortening-the-01kvvgrjj8kz",
   "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-24T15:14:16Z"
+  "worktreeLastSyncedAt": "2026-06-24T15:37:32Z",
+  "reviewPayload": {
+    "verdict": "approve",
+    "summary": "All 7 acceptance criteria pass. The HTTP polling loop is fully removed, the --url branch correctly pipes webtorrent stdout and calls _find_stream_url, LAN IP substitution is applied, and the timeout path exits non-zero with no stdout output. 44/44 tests pass.",
+    "filesReviewedCount": 2,
+    "phasesReviewedCount": 1,
+    "automatedChecks": [
+      {
+        "name": "Test suite",
+        "result": "pass",
+        "detail": "44/44 passed — ALL PASS"
+      }
+    ],
+    "acceptanceCriteria": [
+      {
+        "acId": "AC-1",
+        "text": "`dhtplay <infohash> --url` exits 0 and prints a line containing `http://<lan-ip>:8888/` when webtorrent announces a URL on stdout; verified by S13 passing",
+        "status": "pass",
+        "evidence": "S13_UrlFlag.test_url_flag_prints_http_url_with_lan_ip passes. dhtplay:218-258: Popen launched with stdout=PIPE+text=True, _find_stream_url reads URL, re.sub replaces host, print outputs the URL, returns 0."
+      },
+      {
+        "acId": "AC-2",
+        "text": "The printed URL contains the LAN IP from `get_lan_ip()`, not `localhost` or `127.0.0.1`; verified by `S13.test_url_flag_prints_http_url_with_lan_ip`",
+        "status": "pass",
+        "evidence": "dhtplay:235: re.sub(r'https?://(?:localhost|127\\.0\\.0\\.1)', f'http://{lan_ip}', raw_url). Test mocks get_lan_ip returning '192.168.1.100' and asserts '192.168.1.100' in output and 'localhost' not in output — passes."
+      },
+      {
+        "acId": "AC-3",
+        "text": "When `proc.stdout` yields no URL-matching line, the command exits non-zero and stdout is empty; verified by the new timeout test (R8)",
+        "status": "pass",
+        "evidence": "S13_UrlFlag.test_url_flag_timeout_exits_nonzero_no_stdout passes. dhtplay:228-233: when _find_stream_url returns None, prints error to stderr and returns 3. Test patches _find_stream_url to return None, asserts rc != 0 and out.getvalue() == ''."
+      },
+      {
+        "acId": "AC-4",
+        "text": "The `--url` Popen call does not include `--quiet` in its argument list; verified by the replacement S13 test (R7)",
+        "status": "pass",
+        "evidence": "S13_UrlFlag.test_url_flag_no_quiet passes. dhtplay:219: wt_cmd_http = [wt, magnet, '-p', str(args.port), '--keep-seeding'] — no --quiet present. Test captures all Popen cmd args and asserts '--quiet' not in captured_args."
+      },
+      {
+        "acId": "AC-5",
+        "text": "`_find_stream_url` is called with the subprocess handle and `args.port`; no new URL-scanning logic is introduced; verified by reading `dhtplay` lines 221–270 after the change",
+        "status": "pass",
+        "evidence": "dhtplay:227: raw_url = _find_stream_url(proc, args.port, timeout=30). grep shows exactly two lines: line 116 (definition) and line 227 (call site inside if args.url: block). No new URL-scanning logic introduced."
+      },
+      {
+        "acId": "AC-6",
+        "text": "`grep -n \"urlopen\" dhtplay` returns no results — the HTTP polling loop is fully removed",
+        "status": "pass",
+        "evidence": "grep -n 'urlopen' dhtplay returns exit code 1 with no output. The polling loop and urllib imports are fully removed."
+      },
+      {
+        "acId": "AC-7",
+        "text": "`python3 test_dhtplay.py` exits 0 with all scenarios passing after the change",
+        "status": "pass",
+        "evidence": "python3 test_dhtplay.py: 44/44 passed — ALL PASS. Exit code 0."
+      }
+    ],
+    "headlineFindings": [],
+    "requiredChanges": [],
+    "codeQualityFindings": [],
+    "securityFindings": [],
+    "decisions": [
+      "Use existing _find_stream_url function unchanged — wire it in, don't rewrite it",
+      "Remove --quiet from the webtorrent command and pipe stdout so the URL announcement reaches _find_stream_url",
+      "Patch _find_stream_url in timeout test rather than using iter([]) with the real function to avoid blocking for the full 30s timeout"
+    ],
+    "revision": 1,
+    "changeAnnotations": [
+      {
+        "file": "dhtplay",
+        "note": "Rewrites the --url branch: removes HTTP polling loop, adds stdout=PIPE+text=True to Popen, calls _find_stream_url to read the real streaming URL from webtorrent stdout, applies LAN IP substitution, handles timeout/exit error cases"
+      },
+      {
+        "file": "test_dhtplay.py",
+        "note": "Updates S13-S19 to use proc_mock.stdout iterators instead of urlopen mocks; adds test_url_flag_no_quiet and test_url_flag_timeout_exits_nonzero_no_stdout; renames test_url_flag_prints_http_url_with_infohash to test_url_flag_prints_http_url_with_lan_ip"
+      }
+    ]
+  }
 }

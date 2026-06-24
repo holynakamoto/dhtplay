@@ -1,11 +1,11 @@
 {
   "id": "task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
   "status": "active",
-  "stage": "implementation",
-  "phase": 0,
+  "stage": "review",
+  "phase": 1,
   "totalPhases": 1,
   "createdAt": "2026-06-23T23:48:58Z",
-  "updatedAt": "2026-06-24T00:04:25Z",
+  "updatedAt": "2026-06-24T00:18:13Z",
   "events": [
     {
       "base_branch": "main",
@@ -268,6 +268,108 @@
       "type": "phase_awaiting_approval",
       "worktree_head": "11f70460d21001d86a3e002c5e4f34d960f16d51",
       "worktree_status_digest": "ac15eab7c6c8449b5fde20254efc9dcf31d893e524a9e9d485b52f0f52c6d5fb"
+    },
+    {
+      "approved_by": "user",
+      "phase": 0,
+      "phase_title": "Remove redirect server, add reachability probe, update tests",
+      "timestamp": "2026-06-24T00:15:04Z",
+      "type": "phase_approved"
+    },
+    {
+      "checked_indices": [],
+      "phase": 0,
+      "timestamp": "2026-06-24T00:15:04Z",
+      "type": "manual_tests_checks_persisted"
+    },
+    {
+      "stage": "implementation",
+      "summary": "All phases approved — implementation ready for review.",
+      "timestamp": "2026-06-24T00:15:04Z",
+      "type": "stage_work_complete",
+      "worktree_head": "cc03dd617d4d73e6a647c34999a8bb5684bf16d1",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "base_branch": "main",
+      "merged_commits": 3,
+      "timestamp": "2026-06-24T00:15:05Z",
+      "type": "worktree_synced"
+    },
+    {
+      "actor": null,
+      "stage": "implementation",
+      "timestamp": "2026-06-24T00:15:04Z",
+      "type": "stage_approved"
+    },
+    {
+      "current_worktree_head": "35bec54c529c12e7ccc4240b08d852de89fbc5e9",
+      "current_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stage": "implementation",
+      "stale_worktree_head": "cc03dd617d4d73e6a647c34999a8bb5684bf16d1",
+      "stale_worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timestamp": "2026-06-24T00:15:05Z",
+      "type": "worktree_drift_detected",
+      "what_changed": "HEAD"
+    },
+    {
+      "action": "sweep",
+      "rationale": "Routine sync drift: HEAD fast-forwarded (stale HEAD is a strict ancestor of current) with a byte-identical dirty-status digest; swept forward automatically without waking an agent.",
+      "resolved_by": "auto",
+      "stage": "implementation",
+      "timestamp": "2026-06-24T00:15:05Z",
+      "type": "worktree_drift_resolved"
+    },
+    {
+      "from": "implementation",
+      "timestamp": "2026-06-24T00:15:05Z",
+      "to": "review",
+      "type": "stage_advanced"
+    },
+    {
+      "base_branch": "main",
+      "reason": "already_up_to_date",
+      "timestamp": "2026-06-24T00:15:05Z",
+      "type": "worktree_sync_skipped"
+    },
+    {
+      "mode": "start",
+      "model": "sonnet",
+      "session_id": "01kvvfp012kpnk0mm2hmf33cgm",
+      "stage": "review",
+      "timestamp": "2026-06-24T00:15:05Z",
+      "type": "stage_agent_started"
+    },
+    {
+      "details": "Full test suite (python3 test_dhtplay.py): 43/43 passed including new S19 reachability-probe scenario. S13, S14, S17, S18 all pass with correct mocks for proc.poll, urllib.request.urlopen, and socket.create_connection.",
+      "failed": 0,
+      "passed": 43,
+      "phase": 1,
+      "skipped": 0,
+      "timestamp": "2026-06-24T00:17:26Z",
+      "type": "test_results"
+    },
+    {
+      "change_summary": "APPROVE: All 5 acceptance criteria pass with concrete evidence. The redirect server is fully removed, the Popen call no longer suppresses stdout, the reachability probe correctly gates the URL print behind a TCP check, and all 43 tests pass including the new S19 scenario. No security or convention issues found in the changed files.",
+      "revision": 1,
+      "stage": "review",
+      "timestamp": "2026-06-24T00:17:57Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Review verdict: APPROVE",
+      "rationale": "5/5 acceptance criteria passed, 3/3 automated checks passed. All 43 tests pass including S19. Redirect server fully removed, Popen no longer suppresses stdout, reachability probe correctly implemented with try/finally socket cleanup. No security or code quality issues found in the 2 changed files.",
+      "timestamp": "2026-06-24T00:18:02Z",
+      "type": "decision"
+    },
+    {
+      "stage": "review",
+      "summary": "APPROVE — 5/5 ACs pass, 43/43 tests pass. Redirect server fully removed, Popen no longer suppresses webtorrent stdout, TCP reachability probe correctly gates the URL print with proper socket cleanup. No issues found. Ready for release.",
+      "timestamp": "2026-06-24T00:18:13Z",
+      "type": "stage_work_complete",
+      "worktree_head": "35bec54c529c12e7ccc4240b08d852de89fbc5e9",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
   "needsArchitecture": false,
@@ -285,35 +387,114 @@
     "rationale": "Bug-fix template: the --url path has broken behavior (redirect server causes playback failures, tests S13–S18 partially fail against current code). No UI changes (CLI tool only), so design is skipped. Changes are confined to 2 files and build on existing patterns, so architecture is skipped. Tier standard: bounded refactor of one function plus matching test updates."
   },
   "stageApprovals": {
+    "implementation": "2026-06-24T00:15:04Z",
     "scope": "2026-06-23T23:54:45Z"
   },
   "stageContent": {
+    "review": "## Verdict\n\n**Verdict:** APPROVE\n**Files reviewed:** 2 files changed across 1 phases\n\nAll 5 acceptance criteria pass with concrete evidence. The redirect server is fully removed, the Popen call no longer suppresses stdout, the reachability probe correctly gates the URL print behind a TCP check, and all 43 tests pass including the new S19 scenario. No security or convention issues found in the changed files.\n\n### Automated Checks\n\n| Check | Result | Details |\n|-------|--------|---------|\n| Test suite (python3 test_dhtplay.py) | PASS | 43/43 tests pass including new S19 |\n| --short-port absent from --help | PASS | No --short-port in ./dhtplay --help output |\n| Redirect server symbols absent from dhtplay | PASS | grep -n 'HTTPServer\\|BaseHTTPRequestHandler\\|redir\\|short_port' dhtplay returns no matches |\n\n### Acceptance Criteria (5/5 passed)\n\n- [x] AC-1: `./dhtplay --help` does not list `--short-port` in its output; verified by running the command and checking the help text. — PASS: ./dhtplay --help output lists only: --trackers, --no-trackers, --name, --dry-run, --webtorrent, --url, --port. No --short-port entry present.\n- [x] AC-2: Running `dhtplay <hash> --url` (with mocked subprocess and urlopen) prints a URL containing the LAN IP and the infohash path segment — not a short redirect port URL. Verified by S13 `test_url_flag_prints_http_url_with_infohash`. — PASS: S13 test_url_flag_prints_http_url_with_infohash passes. dhtplay:250 builds file_url = f'http://{lan_ip}:{args.port}{encoded_path}' where lan_ip='192.168.1.100' and encoded_path='/webtorrent/{IH}/Movie.mkv'. Output is '▶  http://192.168.1.100:8888/webtorrent/{IH}/Movie.mkv'.\n- [x] AC-3: When `socket.create_connection` to `(lan_ip, port)` raises `OSError`, the tool exits non-zero and no URL is printed to stdout. Verified by S19. — PASS: S19 test_reachability_probe_exits_nonzero passes. dhtplay:263-269: except OSError block prints to stderr and returns 3 before dhtplay:274 (the print f'▶  {target_url}' line). S19 asserts assertNotEqual(rc, 0) and assertNotIn('http', out.getvalue()).\n- [x] AC-4: The `subprocess.Popen` call in the `--url` branch passes no `stdout` keyword argument. Verified by S13 `test_url_flag_popen_not_piped`. — PASS: S13 test_url_flag_popen_not_piped passes. dhtplay:227: proc = subprocess.Popen(wt_cmd_http) — no stdout kwarg. Confirmed by git diff: removed stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL from this call.\n- [x] AC-5: `python3 test_dhtplay.py` completes with all scenarios passing, including S19. — PASS: python3 test_dhtplay.py output: Ran 43 tests in 0.084s, OK. Final line: 43/43 passed — ALL PASS.\n\n### Code Quality (Refactor Review)\n\nNo code quality issues found in changed files.\n\n### Security Assessment (Security Review)\n\nNo security issues found in changed files.\n\n### Decisions Made During Implementation\n\n- Exit code 3 reused for the reachability probe failure rather than introducing a new exit code 4 — fits existing 'launch failure' meaning and avoids expanding the exit-code surface for a single-user CLI tool.\n- URL discovery in the --url branch continues to use HTTP polling against localhost, not stdout scanning via _find_stream_url — HTTP polling is version-stable; webtorrent TUI output format varies across versions per project memory.\n- Socket probe uses sock=None sentinel so the finally block safely skips sock.close() when create_connection raises OSError before assigning the socket, avoiding NameError/AttributeError in the failure path.\n\n## Required Changes\n\nNone.\n",
     "implementation": "## Phase 1: Remove redirect server, add reachability probe, update tests\n\n### Changes made\n\n**dhtplay:**\n- Removed `--short-port` argparse block (R1)\n- Removed `stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL` kwargs from Popen call in `--url` branch (R12)\n- Removed the entire redirect server block: `from http.server import ...`, `_Redirect` class, `HTTPServer`, daemon thread, `short_url`, `redir.shutdown()` (R2, R3, R4)\n- Added TCP reachability probe after URL resolution using `socket.create_connection((lan_ip, args.port), timeout=2)` with a `sock=None` sentinel and `finally` block for cleanup (R8, R9, R10, R11)\n- Updated `print` and `_render_qr` calls to use `target_url` (the direct LAN file URL or fallback directory URL) instead of the short redirect URL (R5, R6, R7)\n\n**test_dhtplay.py:**\n- S13 (all three methods): added `proc_mock.poll.return_value = None`, `urllib.request.urlopen` mock returning HTML with `.mkv` href, `socket.create_connection` mock (R13)\n- S14: same mocks added; `proc_mock.terminate.assert_called_once()` assertion preserved (R14)\n- S17: same mocks added; `expected_url` updated to direct file URL `http://192.168.1.100:8888/webtorrent/{IH}/Movie.mkv` (R15)\n- S18: same mocks added (R15)\n- S19 added: probe raises `OSError`, asserts exit code non-zero and no `http` in stdout (R16)\n\n### Verification results\n- `python3 test_dhtplay.py` — 43/43 pass\n- `./dhtplay --help | grep short-port` — no output (exit 1)\n- `grep -n \"HTTPServer|BaseHTTPRequestHandler|redir|short_port\" dhtplay` — no matches (exit 1)"
   },
   "stages": {
+    "implementation": {
+      "status": "approved",
+      "approvedAt": "2026-06-24T00:15:04Z",
+      "startedAt": "2026-06-23T23:54:46Z"
+    },
     "architecture": {
       "status": "skipped"
     },
     "review": {
-      "status": "not_started"
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-24T00:15:05Z"
     },
     "design": {
       "status": "skipped"
+    },
+    "release": {
+      "status": "not_started"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-23T23:54:45Z",
       "startedAt": "2026-06-23T23:49:44Z"
-    },
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-23T23:54:46Z"
-    },
-    "release": {
-      "status": "not_started"
     }
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-reviewing-url-hardening-diff-head-port-01kvve65x7kb",
   "worktreeBaseBranch": "main",
-  "worktreeLastSyncedAt": "2026-06-23T23:54:46Z"
+  "worktreeLastSyncedAt": "2026-06-24T00:15:05Z",
+  "reviewPayload": {
+    "verdict": "approve",
+    "summary": "All 5 acceptance criteria pass with concrete evidence. The redirect server is fully removed, the Popen call no longer suppresses stdout, the reachability probe correctly gates the URL print behind a TCP check, and all 43 tests pass including the new S19 scenario. No security or convention issues found in the changed files.",
+    "filesReviewedCount": 2,
+    "phasesReviewedCount": 1,
+    "automatedChecks": [
+      {
+        "name": "Test suite (python3 test_dhtplay.py)",
+        "result": "pass",
+        "detail": "43/43 tests pass including new S19"
+      },
+      {
+        "name": "--short-port absent from --help",
+        "result": "pass",
+        "detail": "No --short-port in ./dhtplay --help output"
+      },
+      {
+        "name": "Redirect server symbols absent from dhtplay",
+        "result": "pass",
+        "detail": "grep -n 'HTTPServer|BaseHTTPRequestHandler|redir|short_port' dhtplay returns no matches"
+      }
+    ],
+    "acceptanceCriteria": [
+      {
+        "acId": "AC-1",
+        "text": "`./dhtplay --help` does not list `--short-port` in its output; verified by running the command and checking the help text.",
+        "status": "pass",
+        "evidence": "./dhtplay --help output lists only: --trackers, --no-trackers, --name, --dry-run, --webtorrent, --url, --port. No --short-port entry present."
+      },
+      {
+        "acId": "AC-2",
+        "text": "Running `dhtplay <hash> --url` (with mocked subprocess and urlopen) prints a URL containing the LAN IP and the infohash path segment — not a short redirect port URL. Verified by S13 `test_url_flag_prints_http_url_with_infohash`.",
+        "status": "pass",
+        "evidence": "S13 test_url_flag_prints_http_url_with_infohash passes. dhtplay:250 builds file_url = f'http://{lan_ip}:{args.port}{encoded_path}' where lan_ip='192.168.1.100' and encoded_path='/webtorrent/{IH}/Movie.mkv'. Output is '▶  http://192.168.1.100:8888/webtorrent/{IH}/Movie.mkv'."
+      },
+      {
+        "acId": "AC-3",
+        "text": "When `socket.create_connection` to `(lan_ip, port)` raises `OSError`, the tool exits non-zero and no URL is printed to stdout. Verified by S19.",
+        "status": "pass",
+        "evidence": "S19 test_reachability_probe_exits_nonzero passes. dhtplay:263-269: except OSError block prints to stderr and returns 3 before dhtplay:274 (the print f'▶  {target_url}' line). S19 asserts assertNotEqual(rc, 0) and assertNotIn('http', out.getvalue())."
+      },
+      {
+        "acId": "AC-4",
+        "text": "The `subprocess.Popen` call in the `--url` branch passes no `stdout` keyword argument. Verified by S13 `test_url_flag_popen_not_piped`.",
+        "status": "pass",
+        "evidence": "S13 test_url_flag_popen_not_piped passes. dhtplay:227: proc = subprocess.Popen(wt_cmd_http) — no stdout kwarg. Confirmed by git diff: removed stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL from this call."
+      },
+      {
+        "acId": "AC-5",
+        "text": "`python3 test_dhtplay.py` completes with all scenarios passing, including S19.",
+        "status": "pass",
+        "evidence": "python3 test_dhtplay.py output: Ran 43 tests in 0.084s, OK. Final line: 43/43 passed — ALL PASS."
+      }
+    ],
+    "headlineFindings": [],
+    "requiredChanges": [],
+    "codeQualityFindings": [],
+    "securityFindings": [],
+    "decisions": [
+      "Exit code 3 reused for the reachability probe failure rather than introducing a new exit code 4 — fits existing 'launch failure' meaning and avoids expanding the exit-code surface for a single-user CLI tool.",
+      "URL discovery in the --url branch continues to use HTTP polling against localhost, not stdout scanning via _find_stream_url — HTTP polling is version-stable; webtorrent TUI output format varies across versions per project memory.",
+      "Socket probe uses sock=None sentinel so the finally block safely skips sock.close() when create_connection raises OSError before assigning the socket, avoiding NameError/AttributeError in the failure path."
+    ],
+    "revision": 1,
+    "changeAnnotations": [
+      {
+        "file": "dhtplay",
+        "note": "Removes the --short-port argparse entry and the entire redirect server block (HTTPServer, _Redirect class, daemon thread, lazy http.server import, short_url). Drops stdout/stderr=DEVNULL from the --url Popen call so webtorrent output reaches the terminal. Adds TCP reachability probe (socket.create_connection with finally-guarded close) after URL resolution and before printing, exiting 3 if the probe fails. Updates print and _render_qr to use the direct LAN file URL instead of the short redirect URL."
+      },
+      {
+        "file": "test_dhtplay.py",
+        "note": "Adds proc.poll, urllib.request.urlopen, and socket.create_connection mocks to S13, S14, S17, and S18 so the polling loop terminates without sleeping and without hitting real network. Updates S17 expected_url from the directory URL to the direct file URL. Adds new S19 class covering the reachability-probe failure path: OSError from socket.create_connection must produce a non-zero exit and no URL on stdout."
+      }
+    ]
+  }
 }

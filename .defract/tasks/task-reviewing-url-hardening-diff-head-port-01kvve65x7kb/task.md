@@ -3,7 +3,7 @@ defract:
   id: task-reviewing-url-hardening-diff-head-port-01kvve65x7kb
   type: bug
   status: active
-  stage: implementation
+  stage: review
   phase: 0
   total_phases: 1
   priority: normal
@@ -152,3 +152,47 @@ The `tempfile` import inside the `--url` branch stays as a lazy import — webto
 - `python3 test_dhtplay.py` — 43/43 pass
 - `./dhtplay --help | grep short-port` — no output (exit 1)
 - `grep -n "HTTPServer|BaseHTTPRequestHandler|redir|short_port" dhtplay` — no matches (exit 1)
+
+## Review
+
+## Verdict
+
+**Verdict:** APPROVE
+**Files reviewed:** 2 files changed across 1 phases
+
+All 5 acceptance criteria pass with concrete evidence. The redirect server is fully removed, the Popen call no longer suppresses stdout, the reachability probe correctly gates the URL print behind a TCP check, and all 43 tests pass including the new S19 scenario. No security or convention issues found in the changed files.
+
+### Automated Checks
+
+| Check | Result | Details |
+|-------|--------|---------|
+| Test suite (python3 test_dhtplay.py) | PASS | 43/43 tests pass including new S19 |
+| --short-port absent from --help | PASS | No --short-port in ./dhtplay --help output |
+| Redirect server symbols absent from dhtplay | PASS | grep -n 'HTTPServer\|BaseHTTPRequestHandler\|redir\|short_port' dhtplay returns no matches |
+
+### Acceptance Criteria (5/5 passed)
+
+- [x] AC-1: `./dhtplay --help` does not list `--short-port` in its output; verified by running the command and checking the help text. — PASS: ./dhtplay --help output lists only: --trackers, --no-trackers, --name, --dry-run, --webtorrent, --url, --port. No --short-port entry present.
+- [x] AC-2: Running `dhtplay <hash> --url` (with mocked subprocess and urlopen) prints a URL containing the LAN IP and the infohash path segment — not a short redirect port URL. Verified by S13 `test_url_flag_prints_http_url_with_infohash`. — PASS: S13 test_url_flag_prints_http_url_with_infohash passes. dhtplay:250 builds file_url = f'http://{lan_ip}:{args.port}{encoded_path}' where lan_ip='192.168.1.100' and encoded_path='/webtorrent/{IH}/Movie.mkv'. Output is '▶  http://192.168.1.100:8888/webtorrent/{IH}/Movie.mkv'.
+- [x] AC-3: When `socket.create_connection` to `(lan_ip, port)` raises `OSError`, the tool exits non-zero and no URL is printed to stdout. Verified by S19. — PASS: S19 test_reachability_probe_exits_nonzero passes. dhtplay:263-269: except OSError block prints to stderr and returns 3 before dhtplay:274 (the print f'▶  {target_url}' line). S19 asserts assertNotEqual(rc, 0) and assertNotIn('http', out.getvalue()).
+- [x] AC-4: The `subprocess.Popen` call in the `--url` branch passes no `stdout` keyword argument. Verified by S13 `test_url_flag_popen_not_piped`. — PASS: S13 test_url_flag_popen_not_piped passes. dhtplay:227: proc = subprocess.Popen(wt_cmd_http) — no stdout kwarg. Confirmed by git diff: removed stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL from this call.
+- [x] AC-5: `python3 test_dhtplay.py` completes with all scenarios passing, including S19. — PASS: python3 test_dhtplay.py output: Ran 43 tests in 0.084s, OK. Final line: 43/43 passed — ALL PASS.
+
+### Code Quality (Refactor Review)
+
+No code quality issues found in changed files.
+
+### Security Assessment (Security Review)
+
+No security issues found in changed files.
+
+### Decisions Made During Implementation
+
+- Exit code 3 reused for the reachability probe failure rather than introducing a new exit code 4 — fits existing 'launch failure' meaning and avoids expanding the exit-code surface for a single-user CLI tool.
+- URL discovery in the --url branch continues to use HTTP polling against localhost, not stdout scanning via _find_stream_url — HTTP polling is version-stable; webtorrent TUI output format varies across versions per project memory.
+- Socket probe uses sock=None sentinel so the finally block safely skips sock.close() when create_connection raises OSError before assigning the socket, avoiding NameError/AttributeError in the failure path.
+
+## Required Changes
+
+None.
+

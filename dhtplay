@@ -10,9 +10,6 @@ import socket
 import subprocess
 import sys
 import threading
-import time
-import urllib.request
-import urllib.parse
 from urllib.parse import quote
 
 TRACKERS = [
@@ -219,43 +216,23 @@ def main(argv=None):
     wt_cmd = [wt, magnet, "--vlc", "-p", str(args.port)]
 
     if args.url:
-        import tempfile
-        out_dir = tempfile.mkdtemp(prefix="dhtplay-")
-        wt_cmd_http = [wt, magnet, "-p", str(args.port),
-                       "--keep-seeding", "--quiet", "--out", out_dir]
+        wt_cmd_http = [wt, magnet, "-p", str(args.port), "--keep-seeding"]
         try:
-            proc = subprocess.Popen(wt_cmd_http)
+            proc = subprocess.Popen(wt_cmd_http, stdout=subprocess.PIPE, text=True)
         except OSError as exc:
             print(f"dhtplay: failed to launch webtorrent: {exc}", file=sys.stderr)
             return 3
 
-        # Wait for the HTTP server to come up, then resolve the actual file URL.
         lan_ip = get_lan_ip()
-        dir_url = f"http://localhost:{args.port}/webtorrent/{ih_hex}/"
-        file_url = None
-        print("waiting for metadata…", end="", flush=True)
-        deadline = time.time() + 120
-        while time.time() < deadline:
+        raw_url = _find_stream_url(proc, args.port, timeout=30)
+        if raw_url is None:
             if proc.poll() is not None:
-                print("\ndhtplay: webtorrent exited unexpectedly", file=sys.stderr)
-                return 3
-            try:
-                with urllib.request.urlopen(dir_url, timeout=2) as r:
-                    html = r.read().decode(errors="replace")
-                hrefs = re.findall(r'href="([^"]+\.(?:mp4|mkv|avi|mov|webm|m4v|ts|flv)[^"]*)"',
-                                   html, re.IGNORECASE)
-                if hrefs:
-                    path = hrefs[0]
-                    encoded_path = urllib.parse.quote(path, safe="/:@!$&'()*+,;=")
-                    file_url = f"http://{lan_ip}:{args.port}{encoded_path}"
-                    break
-            except Exception:
-                pass
-            time.sleep(1)
-            print(".", end="", flush=True)
+                print("dhtplay: webtorrent exited unexpectedly", file=sys.stderr)
+            else:
+                print("dhtplay: timed out waiting for stream URL", file=sys.stderr)
+            return 3
 
-        print()
-        target_url = file_url or f"http://{lan_ip}:{args.port}/webtorrent/{ih_hex}/"
+        target_url = re.sub(r'https?://(?:localhost|127\.0\.0\.1)', f'http://{lan_ip}', raw_url)
 
         sock = None
         try:

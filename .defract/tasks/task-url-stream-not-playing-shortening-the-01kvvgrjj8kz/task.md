@@ -3,7 +3,7 @@ defract:
   id: task-url-stream-not-playing-shortening-the-01kvvgrjj8kz
   type: bug
   status: active
-  stage: review
+  stage: release
   phase: 0
   total_phases: 1
   priority: normal
@@ -190,4 +190,31 @@ No security issues found in changed files.
 ## Required Changes
 
 None.
+
+## Release
+
+## Release Notes
+
+### What was built
+- Fixed `--url` mode by replacing a 120-second HTTP polling loop with direct stdout URL scanning from webtorrent's process output
+- Connected the existing `_find_stream_url` function (previously written but unused) to the `--url` launch path in `main()`
+- Removed `--quiet` from the webtorrent command and added `stdout=subprocess.PIPE, text=True` to capture URL announcements
+- Added LAN IP substitution via `re.sub` so the printed URL is reachable from other devices on the network
+- Updated 7 test scenarios (S13–S19) to mock `proc.stdout` as string iterators instead of `urllib.request.urlopen`
+
+### Key decisions
+- Use existing `_find_stream_url` function unchanged — wire it in, don't rewrite it
+- Remove `--quiet` from the webtorrent command and pipe stdout so the URL announcement reaches `_find_stream_url`
+- Patch `_find_stream_url` in timeout test rather than using `iter([])` with the real function to avoid blocking for the full 30s timeout
+
+### Changes by phase
+- **Phase 1: Replace HTTP polling with stdout URL scanning** — Removed 120-second `urlopen` polling loop; added `stdout=PIPE+text=True` to Popen; called `_find_stream_url` for real URL; applied LAN IP substitution; rewrote S13–S19 tests with `proc_mock.stdout` iterators. 44/44 tests passing.
+
+## Verification
+
+- Production build: Python single-file script — no compilation step; test suite used as build gate
+- Test suite: 44/44 passed — ALL PASS
+- Working tree clean at release; implementation committed as `4362d04 feat(task-url-stream-not-playing-shortening-the-01kvvgrjj8kz): phase 1 — Replace HTTP polling with stdout URL scanning`
+- Feature branch pushed to `origin/feature/task-url-stream-not-playing-shortening-the-01kvvgrjj8kz`
+- Review approved: 2026-06-24 — 7/7 acceptance criteria, all automated checks passed
 

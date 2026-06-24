@@ -5,7 +5,7 @@
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-24T00:33:58Z",
-  "updatedAt": "2026-06-24T00:36:21Z",
+  "updatedAt": "2026-06-24T00:40:40Z",
   "events": [
     {
       "base_branch": "main",
@@ -54,27 +54,82 @@
       "timed_out": false,
       "timestamp": "2026-06-24T00:36:21Z",
       "type": "agent_exited"
+    },
+    {
+      "change_summary": "Full scope: wire _find_stream_url into --url mode, remove HTTP polling loop, update tests S13–S19",
+      "revision": 2,
+      "timestamp": "2026-06-24T00:40:13Z",
+      "type": "scope_update"
+    },
+    {
+      "rationale": "Bug fix: restores broken --url behavior by wiring an existing function into the launch path. No UI changes (skip design). Well-contained to 2 files using an already-written helper (skip architecture).",
+      "stages": [
+        "scope",
+        "implementation",
+        "review",
+        "release"
+      ],
+      "template": "bug-fix",
+      "tier": "standard",
+      "timestamp": "2026-06-24T00:40:19Z",
+      "type": "workflow_classified"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Use existing _find_stream_url function unchanged — wire it in, don't rewrite it",
+      "rationale": "The function already implements the correct approach (daemon thread + queue + port-anchored regex) matching prior project decisions. The only gap is that it was never called in main(). Introducing new URL-scanning logic would duplicate code and risk diverging from the established pattern.",
+      "timestamp": "2026-06-24T00:40:25Z",
+      "type": "decision"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Remove --quiet from the webtorrent command and pipe stdout",
+      "rationale": "--quiet suppresses stdout entirely, which is why the existing _find_stream_url function never received the URL announcement. Piping stdout (stdout=subprocess.PIPE, text=True) makes the URL readable. The two changes are inseparable.",
+      "timestamp": "2026-06-24T00:40:29Z",
+      "type": "decision"
+    },
+    {
+      "stage": "scope",
+      "summary": "Full scope (revision 2) pushed. Single phase: remove the 120-second urlopen polling loop, add stdout=PIPE + text=True to Popen, remove --quiet, call the already-written _find_stream_url to get the URL from webtorrent's stdout, substitute LAN IP for localhost. Tests S13–S19 rewritten to mock proc.stdout instead of urlopen; S13.test_url_flag_popen_not_piped replaced with a --quiet absence check; new test for timeout/empty-stdout path. Workflow: bug-fix, standard tier, scope → implementation → review → release.",
+      "timestamp": "2026-06-24T00:40:40Z",
+      "type": "stage_work_complete",
+      "worktree_head": "aa84c0ce46cc85883375ba1bd82e55ae80d66c3c",
+      "worktree_status_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
+  "needsArchitecture": false,
+  "needsDesign": false,
+  "workflow": {
+    "tier": "standard",
+    "template": "bug-fix",
+    "stages": [
+      "scope",
+      "implementation",
+      "review",
+      "release"
+    ],
+    "classifiedBy": "scope-agent",
+    "rationale": "Bug fix: restores broken --url behavior by wiring an existing function into the launch path. No UI changes (skip design). Well-contained to 2 files using an already-written helper (skip architecture)."
+  },
   "stages": {
+    "architecture": {
+      "status": "skipped"
+    },
+    "design": {
+      "status": "skipped"
+    },
     "review": {
       "status": "not_started"
-    },
-    "scope": {
-      "status": "in_progress",
-      "startedAt": "2026-06-24T00:36:21Z"
     },
     "release": {
       "status": "not_started"
     },
-    "design": {
-      "status": "not_started"
-    },
-    "architecture": {
-      "status": "not_started"
-    },
     "implementation": {
       "status": "not_started"
+    },
+    "scope": {
+      "status": "awaiting_approval",
+      "startedAt": "2026-06-24T00:36:21Z"
     }
   },
   "worktreePath": "/Users/nickmoore/dhtplay/.defract-worktrees/task-url-stream-not-playing-shortening-the-01kvvgrjj8kz",

@@ -6,7 +6,8 @@ This project uses [defract](https://defract.dev) for structured AI-assisted deve
 
 | Task | Stage | Status |
 |------|-------|--------|
-| Reviewing --url hardening diff (HEAD, port guard, fail-fast) | scope | active |
+| --url stream not playing + shortening the URL | scope | active |
+| Simplify --url output: drop redirect server, QR-encode direct file URL, add LAN reachability probe | release | active |
 | Building dhtplay capability test matrix | release | completed |
 | Shortening --url output to http://{LANIP}:8888 | release | completed |
 | Stream to mobile VLC via URL, no local VLC | release | completed |

@@ -5,7 +5,7 @@
   "phase": 0,
   "totalPhases": 1,
   "createdAt": "2026-06-23T23:48:58Z",
-  "updatedAt": "2026-06-23T23:54:46Z",
+  "updatedAt": "2026-06-24T00:04:25Z",
   "events": [
     {
       "base_branch": "main",
@@ -151,6 +151,123 @@
       "timed_out": false,
       "timestamp": "2026-06-23T23:54:46Z",
       "type": "agent_exited"
+    },
+    {
+      "note": "Starting Phase 1: remove redirect server, add reachability probe, update tests",
+      "phase": 0,
+      "stage": "implementation",
+      "timestamp": "2026-06-24T00:01:28Z",
+      "type": "work_resumed"
+    },
+    {
+      "description": "Starting phase 1: Remove redirect server, add reachability probe, update tests",
+      "percentage": 0,
+      "phase": 1,
+      "timestamp": "2026-06-24T00:01:29Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Implementing core changes to dhtplay and test_dhtplay.py",
+      "percentage": 20,
+      "phase": 1,
+      "timestamp": "2026-06-24T00:01:59Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running verification checks",
+      "percentage": 60,
+      "phase": 1,
+      "timestamp": "2026-06-24T00:03:26Z",
+      "type": "progress_report"
+    },
+    {
+      "description": "Running full check suite",
+      "percentage": 80,
+      "phase": 1,
+      "timestamp": "2026-06-24T00:03:37Z",
+      "type": "progress_report"
+    },
+    {
+      "details": "All 43 tests pass including the new S19 reachability-probe scenario. S13, S14, S17, S18 all pass with correct mocks for proc.poll, urllib.request.urlopen, and socket.create_connection.",
+      "failed": 0,
+      "passed": 43,
+      "phase": 0,
+      "skipped": 0,
+      "timestamp": "2026-06-24T00:03:43Z",
+      "type": "test_results"
+    },
+    {
+      "alternatives_considered": [],
+      "decision": "Implementation: socket probe uses sock=None sentinel so the finally block can safely skip sock.close() when create_connection raises OSError before assigning the socket.",
+      "phase": 1,
+      "rationale": "The return-inside-except pattern means the finally block always runs. Initialising sock=None before the try and guarding with `if sock is not None` avoids a NameError/AttributeError in the failure path while still ensuring the socket is closed in the success path.",
+      "timestamp": "2026-06-24T00:03:46Z",
+      "type": "decision"
+    },
+    {
+      "description": "Phase 1 implementation complete — awaiting approval",
+      "percentage": 100,
+      "phase": 1,
+      "timestamp": "2026-06-24T00:03:50Z",
+      "type": "progress_report"
+    },
+    {
+      "change_summary": "Phase 1 complete: Remove redirect server, add reachability probe, update tests",
+      "revision": 1,
+      "stage": "implementation",
+      "timestamp": "2026-06-24T00:04:01Z",
+      "type": "stage_content_updated"
+    },
+    {
+      "artifacts_created": [
+        "dhtplay",
+        "test_dhtplay.py"
+      ],
+      "phase": 0,
+      "summary": "Removed redirect server and --short-port arg; webtorrent Popen no longer suppresses stdout; added TCP reachability probe (exit 3 on OSError); QR/print now use the direct LAN file URL. All 43 tests pass including new S19.",
+      "timestamp": "2026-06-24T00:04:06Z",
+      "type": "phase_completed"
+    },
+    {
+      "items": [
+        {
+          "description": "Run `./dhtplay --help` and confirm `--short-port` does not appear anywhere in the output."
+        },
+        {
+          "description": "Run `grep -n 'HTTPServer\\|BaseHTTPRequestHandler\\|redir\\|short_port' dhtplay` and confirm no lines are returned."
+        },
+        {
+          "description": "Run `python3 test_dhtplay.py` and confirm the final line reads `43/43 passed  — ALL PASS`."
+        },
+        {
+          "description": "With a real infohash, run `./dhtplay <hash> --url` on a machine with webtorrent installed and confirm the printed URL is a direct `http://<LAN-IP>:8888/webtorrent/<hash>/...` path, not a short redirect URL on port 8889."
+        },
+        {
+          "description": "While `./dhtplay <hash> --url` is running, confirm webtorrent's TUI output (progress bars, peer counts) is visible in the terminal — it should not be suppressed."
+        },
+        {
+          "description": "On a machine where webtorrent binds only to `127.0.0.1`, run `./dhtplay <hash> --url` and confirm the tool exits non-zero and prints a `streaming server not reachable` error to stderr before printing any URL to stdout."
+        }
+      ],
+      "phase": 0,
+      "phase_title": "Remove redirect server, add reachability probe, update tests",
+      "timestamp": "2026-06-24T00:04:21Z",
+      "type": "manual_tests"
+    },
+    {
+      "agent_phase": 1,
+      "phase_title": "Remove redirect server, add reachability probe, update tests",
+      "server_phase": 0,
+      "timestamp": "2026-06-24T00:04:25Z",
+      "type": "phase_drift_detected"
+    },
+    {
+      "phase": 0,
+      "phase_title": "Remove redirect server, add reachability probe, update tests",
+      "timestamp": "2026-06-24T00:04:25Z",
+      "type": "phase_awaiting_approval",
+      "worktree_head": "11f70460d21001d86a3e002c5e4f34d960f16d51",
+      "worktree_status_digest": "ac15eab7c6c8449b5fde20254efc9dcf31d893e524a9e9d485b52f0f52c6d5fb"
     }
   ],
   "needsArchitecture": false,
@@ -170,26 +287,29 @@
   "stageApprovals": {
     "scope": "2026-06-23T23:54:45Z"
   },
+  "stageContent": {
+    "implementation": "## Phase 1: Remove redirect server, add reachability probe, update tests\n\n### Changes made\n\n**dhtplay:**\n- Removed `--short-port` argparse block (R1)\n- Removed `stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL` kwargs from Popen call in `--url` branch (R12)\n- Removed the entire redirect server block: `from http.server import ...`, `_Redirect` class, `HTTPServer`, daemon thread, `short_url`, `redir.shutdown()` (R2, R3, R4)\n- Added TCP reachability probe after URL resolution using `socket.create_connection((lan_ip, args.port), timeout=2)` with a `sock=None` sentinel and `finally` block for cleanup (R8, R9, R10, R11)\n- Updated `print` and `_render_qr` calls to use `target_url` (the direct LAN file URL or fallback directory URL) instead of the short redirect URL (R5, R6, R7)\n\n**test_dhtplay.py:**\n- S13 (all three methods): added `proc_mock.poll.return_value = None`, `urllib.request.urlopen` mock returning HTML with `.mkv` href, `socket.create_connection` mock (R13)\n- S14: same mocks added; `proc_mock.terminate.assert_called_once()` assertion preserved (R14)\n- S17: same mocks added; `expected_url` updated to direct file URL `http://192.168.1.100:8888/webtorrent/{IH}/Movie.mkv` (R15)\n- S18: same mocks added (R15)\n- S19 added: probe raises `OSError`, asserts exit code non-zero and no `http` in stdout (R16)\n\n### Verification results\n- `python3 test_dhtplay.py` — 43/43 pass\n- `./dhtplay --help | grep short-port` — no output (exit 1)\n- `grep -n \"HTTPServer|BaseHTTPRequestHandler|redir|short_port\" dhtplay` — no matches (exit 1)"
+  },
   "stages": {
-    "release": {
+    "architecture": {
+      "status": "skipped"
+    },
+    "review": {
       "status": "not_started"
     },
     "design": {
       "status": "skipped"
-    },
-    "architecture": {
-      "status": "skipped"
-    },
-    "implementation": {
-      "status": "in_progress",
-      "startedAt": "2026-06-23T23:54:46Z"
     },
     "scope": {
       "status": "approved",
       "approvedAt": "2026-06-23T23:54:45Z",
       "startedAt": "2026-06-23T23:49:44Z"
     },
-    "review": {
+    "implementation": {
+      "status": "in_progress",
+      "startedAt": "2026-06-23T23:54:46Z"
+    },
+    "release": {
       "status": "not_started"
     }
   },

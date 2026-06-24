@@ -14,7 +14,6 @@ defract:
   assignee: holynakamoto
 ---
 
-
 ## Story Brief
 
 # Simplify --url output: drop redirect server, QR-encode direct file URL, add LAN reachability probe
@@ -128,3 +127,28 @@ The existing `_find_stream_url` function (lines 119–140) scans subprocess stdo
 Reachability probe implementation: `sock = socket.create_connection((lan_ip, port), timeout=2)` inside `try/finally: sock.close()`, wrapped in `except OSError`.
 
 The `tempfile` import inside the `--url` branch stays as a lazy import — webtorrent still needs `--out <tempdir>` to know where to write downloaded files.
+
+## Implementation Notes
+
+## Phase 1: Remove redirect server, add reachability probe, update tests
+
+### Changes made
+
+**dhtplay:**
+- Removed `--short-port` argparse block (R1)
+- Removed `stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL` kwargs from Popen call in `--url` branch (R12)
+- Removed the entire redirect server block: `from http.server import ...`, `_Redirect` class, `HTTPServer`, daemon thread, `short_url`, `redir.shutdown()` (R2, R3, R4)
+- Added TCP reachability probe after URL resolution using `socket.create_connection((lan_ip, args.port), timeout=2)` with a `sock=None` sentinel and `finally` block for cleanup (R8, R9, R10, R11)
+- Updated `print` and `_render_qr` calls to use `target_url` (the direct LAN file URL or fallback directory URL) instead of the short redirect URL (R5, R6, R7)
+
+**test_dhtplay.py:**
+- S13 (all three methods): added `proc_mock.poll.return_value = None`, `urllib.request.urlopen` mock returning HTML with `.mkv` href, `socket.create_connection` mock (R13)
+- S14: same mocks added; `proc_mock.terminate.assert_called_once()` assertion preserved (R14)
+- S17: same mocks added; `expected_url` updated to direct file URL `http://192.168.1.100:8888/webtorrent/{IH}/Movie.mkv` (R15)
+- S18: same mocks added (R15)
+- S19 added: probe raises `OSError`, asserts exit code non-zero and no `http` in stdout (R16)
+
+### Verification results
+- `python3 test_dhtplay.py` — 43/43 pass
+- `./dhtplay --help | grep short-port` — no output (exit 1)
+- `grep -n "HTTPServer|BaseHTTPRequestHandler|redir|short_port" dhtplay` — no matches (exit 1)

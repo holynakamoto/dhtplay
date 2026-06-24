@@ -3,7 +3,7 @@ defract:
   id: task-reviewing-url-hardening-diff-head-port-01kvve65x7kb
   type: bug
   status: active
-  stage: review
+  stage: release
   phase: 0
   total_phases: 1
   priority: normal
@@ -195,4 +195,34 @@ No security issues found in changed files.
 ## Required Changes
 
 None.
+
+## Release
+
+## Release Notes
+
+### What was built
+- Removed the redirect server (`HTTPServer`, `_Redirect` class, daemon thread, lazy `http.server` import) from the `--url` branch — eliminating the unnecessary redirect hop that was suspected of causing remote VLC playback failures
+- Removed the `--short-port` CLI argument; the tool no longer starts a secondary redirect server
+- Removed `stdout=subprocess.DEVNULL`/`stderr=subprocess.DEVNULL` from the `--url` Popen call so webtorrent's TUI output and progress bars pass through to the terminal
+- Added a TCP reachability probe (`socket.create_connection`) after URL resolution and before printing, exiting with code 3 and a descriptive stderr message if the streaming server is not reachable from the LAN IP
+- Updated tests S13, S14, S17, S18 with correct mocks (`proc.poll`, `urllib.request.urlopen`, `socket.create_connection`) and added new S19 covering the probe failure path; all 43 tests pass
+
+### Key decisions
+- Exit code 3 reused for the reachability probe failure rather than introducing a new exit code 4 — fits existing "launch failure" meaning and avoids expanding the exit-code surface for a single-user CLI tool
+- URL discovery in the `--url` branch continues via HTTP polling against localhost, not stdout scanning via `_find_stream_url` — HTTP polling is version-stable; webtorrent TUI output format varies across versions
+- Socket probe uses `sock=None` sentinel so the `finally` block safely skips `sock.close()` when `create_connection` raises `OSError` before assigning the socket, avoiding `NameError`/`AttributeError` in the failure path
+
+### Changes by phase
+- **Phase 1: Remove redirect server, add reachability probe, update tests** — Removed redirect server and `--short-port`; webtorrent Popen no longer suppresses stdout; added TCP reachability probe (exit 3 on `OSError`); QR/print now use the direct LAN file URL. All 43 tests pass including new S19.
+
+## Verification
+
+### Production Build
+- `python3 -m py_compile dhtplay` — PASS
+
+### Review Reference
+Approved by reviewer on 2026-06-24T00:25:53Z — 5/5 acceptance criteria, all automated checks passed
+
+### Code Pushed
+Branch `feature/task-reviewing-url-hardening-diff-head-port-01kvve65x7kb` pushed to `origin` — new branch created on remote
 

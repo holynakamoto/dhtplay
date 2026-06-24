@@ -190,14 +190,6 @@ def main(argv=None):
         metavar="PORT",
         help="HTTP streaming server port (default: 8888)",
     )
-    ap.add_argument(
-        "--short-port",
-        type=int,
-        default=None,
-        metavar="PORT",
-        help="port for the short redirect URL (default: streaming port + 1)",
-    )
-
     args = ap.parse_args(argv)
 
     # --- validate / normalise -------------------------------------------------
@@ -232,9 +224,7 @@ def main(argv=None):
         wt_cmd_http = [wt, magnet, "-p", str(args.port),
                        "--keep-seeding", "--quiet", "--out", out_dir]
         try:
-            proc = subprocess.Popen(wt_cmd_http,
-                                    stdout=subprocess.DEVNULL,
-                                    stderr=subprocess.DEVNULL)
+            proc = subprocess.Popen(wt_cmd_http)
         except OSError as exc:
             print(f"dhtplay: failed to launch webtorrent: {exc}", file=sys.stderr)
             return 3
@@ -267,30 +257,27 @@ def main(argv=None):
         print()
         target_url = file_url or f"http://{lan_ip}:{args.port}/webtorrent/{ih_hex}/"
 
-        # Start a tiny redirect server so the user gets a short URL.
-        short_port = args.short_port if args.short_port else args.port + 1
-        from http.server import BaseHTTPRequestHandler, HTTPServer
+        sock = None
+        try:
+            sock = socket.create_connection((lan_ip, args.port), timeout=2)
+        except OSError:
+            print(
+                f"dhtplay: streaming server not reachable at {lan_ip}:{args.port}"
+                " — is webtorrent bound to 0.0.0.0?",
+                file=sys.stderr,
+            )
+            return 3
+        finally:
+            if sock is not None:
+                sock.close()
 
-        class _Redirect(BaseHTTPRequestHandler):
-            def do_GET(self):
-                self.send_response(302)
-                self.send_header("Location", target_url)
-                self.end_headers()
-            def log_message(self, *a):
-                pass
-
-        redir = HTTPServer(("", short_port), _Redirect)
-        threading.Thread(target=redir.serve_forever, daemon=True).start()
-
-        short_url = f"http://{lan_ip}:{short_port}"
-        print(f"▶  {short_url}")
-        _render_qr(short_url)
+        print(f"▶  {target_url}")
+        _render_qr(target_url)
 
         try:
             proc.wait()
         except KeyboardInterrupt:
             proc.terminate()
-            redir.shutdown()
         return 0
 
     try:

@@ -392,12 +392,20 @@ class S13_UrlFlag(unittest.TestCase):
         import io
         from contextlib import redirect_stdout
         proc_mock = MagicMock()
+        proc_mock.poll.return_value = None
         proc_mock.wait.return_value = None
         popen_mock = MagicMock(return_value=proc_mock)
+        html = f'<html><a href="/webtorrent/{self.IH}/Movie.mkv">Movie.mkv</a></html>'
+        resp_mock = MagicMock()
+        resp_mock.__enter__.return_value = resp_mock
+        resp_mock.read.return_value = html.encode()
+        urlopen_mock = MagicMock(return_value=resp_mock)
         out = io.StringIO()
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("urllib.request.urlopen", urlopen_mock), \
+             patch("socket.create_connection", return_value=MagicMock()), \
              patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
@@ -411,12 +419,20 @@ class S13_UrlFlag(unittest.TestCase):
         import io
         from contextlib import redirect_stdout
         proc_mock = MagicMock()
+        proc_mock.poll.return_value = None
         proc_mock.wait.return_value = None
         popen_mock = MagicMock(return_value=proc_mock)
+        html = f'<html><a href="/webtorrent/{self.IH}/Movie.mkv">Movie.mkv</a></html>'
+        resp_mock = MagicMock()
+        resp_mock.__enter__.return_value = resp_mock
+        resp_mock.read.return_value = html.encode()
+        urlopen_mock = MagicMock(return_value=resp_mock)
         out = io.StringIO()
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("urllib.request.urlopen", urlopen_mock), \
+             patch("socket.create_connection", return_value=MagicMock()), \
              patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
@@ -430,14 +446,22 @@ class S13_UrlFlag(unittest.TestCase):
         from contextlib import redirect_stdout
         captured_kwargs = {}
         proc_mock = MagicMock()
+        proc_mock.poll.return_value = None
         proc_mock.wait.return_value = None
         def capturing_popen(cmd, **kwargs):
             captured_kwargs.update(kwargs)
             return proc_mock
+        html = f'<html><a href="/webtorrent/{self.IH}/Movie.mkv">Movie.mkv</a></html>'
+        resp_mock = MagicMock()
+        resp_mock.__enter__.return_value = resp_mock
+        resp_mock.read.return_value = html.encode()
+        urlopen_mock = MagicMock(return_value=resp_mock)
         out = io.StringIO()
         with patch("dhtplay.subprocess.Popen", capturing_popen), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("urllib.request.urlopen", urlopen_mock), \
+             patch("socket.create_connection", return_value=MagicMock()), \
              patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             main([self.IH, "--url"])
@@ -457,12 +481,20 @@ class S14_UrlKeyboardInterrupt(unittest.TestCase):
         import io
         from contextlib import redirect_stdout
         proc_mock = MagicMock()
+        proc_mock.poll.return_value = None
         proc_mock.wait.side_effect = KeyboardInterrupt
         popen_mock = MagicMock(return_value=proc_mock)
+        html = f'<html><a href="/webtorrent/{self.IH}/Movie.mkv">Movie.mkv</a></html>'
+        resp_mock = MagicMock()
+        resp_mock.__enter__.return_value = resp_mock
+        resp_mock.read.return_value = html.encode()
+        urlopen_mock = MagicMock(return_value=resp_mock)
         out = io.StringIO()
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="127.0.0.1"), \
+             patch("urllib.request.urlopen", urlopen_mock), \
+             patch("socket.create_connection", return_value=MagicMock()), \
              patch("dhtplay._render_qr"), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
@@ -542,18 +574,26 @@ class S17_QrCode(unittest.TestCase):
         import io
         from contextlib import redirect_stdout
         proc_mock = MagicMock()
+        proc_mock.poll.return_value = None
         proc_mock.wait.return_value = None
         popen_mock = MagicMock(return_value=proc_mock)
+        html = f'<html><a href="/webtorrent/{self.IH}/Movie.mkv">Movie.mkv</a></html>'
+        resp_mock = MagicMock()
+        resp_mock.__enter__.return_value = resp_mock
+        resp_mock.read.return_value = html.encode()
+        urlopen_mock = MagicMock(return_value=resp_mock)
         run_mock = MagicMock()
         out = io.StringIO()
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("urllib.request.urlopen", urlopen_mock), \
+             patch("socket.create_connection", return_value=MagicMock()), \
              patch("dhtplay.subprocess.run", run_mock), \
              redirect_stdout(out):
             rc = main([self.IH, "--url"])
         self.assertEqual(rc, 0)
-        expected_url = f"http://192.168.1.100:8888/webtorrent/{self.IH}/"
+        expected_url = f"http://192.168.1.100:8888/webtorrent/{self.IH}/Movie.mkv"
         run_mock.assert_called_once_with(
             ["qrencode", "-t", "ansiutf8", expected_url]
         )
@@ -572,18 +612,59 @@ class S18_QrCodeAbsent(unittest.TestCase):
         import io
         from contextlib import redirect_stdout, redirect_stderr
         proc_mock = MagicMock()
+        proc_mock.poll.return_value = None
         proc_mock.wait.return_value = None
         popen_mock = MagicMock(return_value=proc_mock)
+        html = f'<html><a href="/webtorrent/{self.IH}/Movie.mkv">Movie.mkv</a></html>'
+        resp_mock = MagicMock()
+        resp_mock.__enter__.return_value = resp_mock
+        resp_mock.read.return_value = html.encode()
+        urlopen_mock = MagicMock(return_value=resp_mock)
         out = io.StringIO()
         err = io.StringIO()
         with patch("dhtplay.subprocess.Popen", popen_mock), \
              patch("dhtplay.find_webtorrent", return_value=self.WT), \
              patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("urllib.request.urlopen", urlopen_mock), \
+             patch("socket.create_connection", return_value=MagicMock()), \
              patch("dhtplay.subprocess.run", side_effect=FileNotFoundError("qrencode not found")), \
              redirect_stdout(out), redirect_stderr(err):
             rc = main([self.IH, "--url"])
         self.assertEqual(rc, 0)
         self.assertEqual(err.getvalue(), "")
+
+
+# ===========================================================================
+# S19 — --url reachability probe failure: exit non-zero, no URL printed
+# ===========================================================================
+class S19_ReachabilityProbeFailure(unittest.TestCase):
+    """CRITERIA: when TCP probe raises OSError, exit code is non-zero and no URL in stdout."""
+
+    IH = "aabbccddee" * 4
+    WT = "/opt/homebrew/bin/webtorrent"
+
+    def test_reachability_probe_exits_nonzero(self):
+        import io
+        from contextlib import redirect_stdout, redirect_stderr
+        proc_mock = MagicMock()
+        proc_mock.poll.return_value = None
+        popen_mock = MagicMock(return_value=proc_mock)
+        html = f'<html><a href="/webtorrent/{self.IH}/Movie.mkv">Movie.mkv</a></html>'
+        resp_mock = MagicMock()
+        resp_mock.__enter__.return_value = resp_mock
+        resp_mock.read.return_value = html.encode()
+        urlopen_mock = MagicMock(return_value=resp_mock)
+        out = io.StringIO()
+        err = io.StringIO()
+        with patch("dhtplay.subprocess.Popen", popen_mock), \
+             patch("dhtplay.find_webtorrent", return_value=self.WT), \
+             patch("dhtplay.get_lan_ip", return_value="192.168.1.100"), \
+             patch("urllib.request.urlopen", urlopen_mock), \
+             patch("socket.create_connection", side_effect=OSError("connection refused")), \
+             redirect_stdout(out), redirect_stderr(err):
+            rc = main([self.IH, "--url"])
+        self.assertNotEqual(rc, 0)
+        self.assertNotIn("http", out.getvalue())
 
 
 # ---------------------------------------------------------------------------
